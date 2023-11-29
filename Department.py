@@ -1,3 +1,7 @@
+# collections 
+departments = db['departments']
+    department_count = departments.count_documents({})
+    print(f'Departments in the collection so far: {department_count}')
 
 # unique indexes 
 departments_indexes = departments.index_information()
