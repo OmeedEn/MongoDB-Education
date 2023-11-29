@@ -1,4 +1,41 @@
 
+# unique indexes 
+departments_indexes = departments.index_information()
+
+    if 'abbreviation' in departments_indexes.keys():
+        print('abbreviation index present.')
+    else:
+        # Create a single UNIQUE index on abbreviation
+        departments.create_index([('abbreviation', pymongo.ASCENDING)],
+                                 unique=True,
+                                 name='abbreviations')
+
+    if 'chair_name' in departments_indexes.keys():
+        print('chair name index present.')
+    else:
+        # Create a single UNIQUE index on chair name
+        departments.create_index([('chair_name', pymongo.ASCENDING)],
+                                 unique=True,
+                                 name='chair_names')
+
+    if 'buildings_and_offices' in departments_indexes.keys():
+        print('building and office index present.')
+    else:
+        # Create a single UNIQUE index on BOTH the building and office
+        departments.create_index([('building', pymongo.ASCENDING), ('office', pymongo.ASCENDING)],
+                                 unique=True,
+                                 name='buildings_and_offices')
+
+    if 'description' in departments_indexes.keys():
+        print('description index present.')
+    else:
+        # Create a single UNIQUE index on description
+        departments.create_index([('description', pymongo.ASCENDING)],
+                                 unique=True,
+                                 name='descriptions')
+    pprint(departments.index_information())
+
+# schema 
     department_validator = {
         'validator': {
             '$jsonSchema': {
