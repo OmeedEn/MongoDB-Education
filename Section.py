@@ -54,7 +54,7 @@ class Section(db):
                     },
                     'semester': {
                         'bsonType': 'string',
-                        'enum': ['Fall', 'Spring', 'Winter', 'Summer I', 'Summer II'],
+                        'enum': ['Fall', 'Spring', 'Summer I', 'Summer II', 'Summer III', 'Winter'],
                         'minLength': 1,
                         'maxLength': 50,
                         'description': 'The given semester a course is in.'
@@ -78,7 +78,8 @@ class Section(db):
                         'bsonType': 'string',
                         'minLength': 1,
                         'maxLength': 6,
-                        'enum': ['VEC','ECS','EN2','EN3','EN4','ET','SSPA'],
+                        'enum': ['ANAC', 'CDC', 'DC', 'ECS', 'EN2', 'EN3', 'EN4',
+                                 'EN5', 'ET', 'HSCI', 'NUR', 'VEC'],
                         'description': 'the building that the section is being taught in'
                     },
                     'startTime': {
