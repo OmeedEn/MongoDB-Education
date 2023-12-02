@@ -146,10 +146,6 @@ if __name__ == '__main__':
     db = client["Demonstration"]
     # Print off the collections that we have available to us, again more of a test than anything.
     print(db.list_collection_names())
-    # student is our students collection within this database.
-    # Merely referencing this collection will create it, although it won't show up in Atlas until
-    # we insert our first document into this collection.
-
 
     # insert our student, department, major, course collections here when ready...
 
