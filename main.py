@@ -138,3 +138,22 @@ def list_student(db):
         pprint(student)
 
 if __name__ == '__main__':
+    cluster = ""
+    client = MongoClient(cluster)
+    # As a test that the connection worked, print out the database names.
+    print(client.list_database_names())
+    # db will be the way that we refer to the database from here on out.
+    db = client["Demonstration"]
+    # Print off the collections that we have available to us, again more of a test than anything.
+    print(db.list_collection_names())
+    # student is our students collection within this database.
+    # Merely referencing this collection will create it, although it won't show up in Atlas until
+    # we insert our first document into this collection.
+
+
+    # insert our student, department, major, course collections here when ready...
+
+    while main_action != menu_main.last_action():
+        main_action = menu_main.menu_prompt()
+        print('next action: ', main_action)
+        exec(main_action)
