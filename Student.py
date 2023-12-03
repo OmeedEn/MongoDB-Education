@@ -25,5 +25,41 @@ students_indexes = students.index_information()
 
 
 # schema
+   student_validator = {
+        'validator': {
+            '$jsonSchema': {
+                'bsonType': 'object',
+                'description': 'A student in a university.',
+                'required': ['student_id', 'lastname', 'firstname', 'email'],
+                'additionalProperties': False,
+                'properties': {
+                    '_id': {},
+                    'student_id': {
+                        'bsonType': 'integer',
+                        'description': 'Student identification number'
+                        #add the primary key relation
+                    },
+                    'lastname': {
+                        'bsonType': 'string',
+                        'minLength': 1,
+                        'maxLength': 50,
+                        'description': 'Last name of the student'
+                    },
+                    'firstname': {
+                        'bsonType': 'string',
+                        'minLength': 1,
+                        'maxLength': 50,
+                        'description': 'First name of the student'
+                    },
+                    'email': {
+                        'bsonType': 'string',
+                        'minLength': 1,
+                        'maxLength': 255,
+                        'decription': 'email of the student'
+                }
+            }
+        }
+    }
+}
 
 
