@@ -30,13 +30,13 @@ departments_indexes = departments.index_information()
                                  unique=True,
                                  name='buildings_and_offices')
 
-    if 'description' in departments_indexes.keys():
-        print('description index present.')
+    if 'name' in departments_indexes.keys():
+        print('name index present.')
     else:
-        # Create a single UNIQUE index on description
-        departments.create_index([('description', pymongo.ASCENDING)],
+        # Create a single UNIQUE index on name
+        departments.create_index([('name', pymongo.ASCENDING)],
                                  unique=True,
-                                 name='descriptions')
+                                 name='names')
     pprint(departments.index_information())
 
 # schema 
