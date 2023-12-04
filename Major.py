@@ -14,6 +14,7 @@ majors_indexes = majors.index_information()
         majors.create_index([('name', pymongo.ASCENDING)],
                             unique=True,
                             name='name')
+    pprint(majors.index_information())
 
 # schema
 
