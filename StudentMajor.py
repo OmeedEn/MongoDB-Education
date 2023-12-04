@@ -5,6 +5,15 @@
 
 
 # unique index 
+studentMajors_index = studentMajors.index_information()
+    if 'student_and_majorName' in studentMajors_index.keys():
+        print('student and major name index present')
+    else:
+        # create a single UNIQUE index on student and majorName
+        studentMajors.create_index([('student', pymongo.ASCENDING), ('majorName', pymongo.ASCENDING)],
+                                   unique=True,
+                                   name='student_and_majorNames')
+    pprint(studentMajors.index_information())
 
 
 # schema 
