@@ -223,7 +223,7 @@ def delete_department(db):
     # many documents we deleted.
     print(f"We just deleted: {deleted.deleted_count} departments.")
 
-#add add, delete, and list for course, section, major...
+#add add, delete, select, and list for course, section, major...
 if __name__ == '__main__':
     cluster = ""
     client = MongoClient(cluster)
