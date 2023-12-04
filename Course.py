@@ -5,6 +5,23 @@ courses = db['courses']
 
 
 # unique index 
+courses_index = courses.index_information()
+
+    if 'departmentAbbreviation_and_courseName' in courses_index.keys():
+        print('department abbreviation and course name index present')
+    else:
+        # create a single UNIQUE index on departmentAbbreviation and courseName
+        courses.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseName', pymongo.ASCENDING)],
+                             unique=True,
+                             name='departmentAbbreviation_and_courseNames')
+        
+    if 'departmentAbbreviation_and_courseNumber' in courses_index.keys():
+        print('department abbreviation and course number index present')
+    else:
+        # create a single UNIQUE index on departmentAbbreviation and courseNumber
+        courses.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseNumber', pymongo.ASCENDING)],
+                             unique=True,
+                             name='departmentAbbreviation_and_courseNumbers')
 
 
 # schema 
