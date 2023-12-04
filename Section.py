@@ -5,6 +5,42 @@ sections = db['sections']
 
 # unique indexes 
 
+sections_index = sections.index_information()
+    if 'course_sectionNumber_semester_sectionYear' in sections_index.keys():
+        print('course, section year, section number, and semester index present')
+    else:
+        # create a single UNIQUE index on course, section year, section number, and semester
+        sections.create_index([('course', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
+                               ('sectionNumber', pymongo.ASCENDING), ('semester', pymongo.ASCENDING)],
+                              unique=True,
+                              name='course_sectionNumber_semester_sectionYears')
+    if 'semester_sectionYear_building_room_schedule_startTime' in sections_index.keys():
+        print('semester, section year, building, room, schedule, and start time index present')
+    else:
+        # create a UNIQUE index on semester, section year, building, room, schedule, start time
+        sections.create_index([('semester', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
+                               ('building', pymongo.ASCENDING), ('room', pymongo.ASCENDING),
+                               ('schedule', pymongo.ASCENDING), ('startTime', pymongo.ASCENDING)],
+                              unique=True,
+                              name='semester_sectionYear_building_room_schedule_startTimes')
+    if 'semester_sectionYear_schedule_startTime_instructor' in sections_index.keys():
+        print('semester, section year, schedule, start time, instructor index present')
+    else:
+        # create a UNQIUE index on semester, section year, schedule, start time, instructor
+        sections.create_index([('semester', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
+                               ('schedule', pymongo.ASCENDING), ('startTime', pymongo.ASCENDING),
+                               ('instructor', pymongo.ASCENDING)],
+                              unique=True,
+                              name='semester_sectionYear_schedule_startTime_instructors')
+    if 'departmentAbbreviation_courseNumber_studentID_semester_sectionYear' in sections_index.keys():
+        print('department abbreviation, course number, student ID, semester, section year index present')
+    else:
+        # create a UNQIUE index on department abbreviation, course number, student ID, semester, section year
+        sections.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseNumber', pymongo.ASCENDING),
+                               ('studentID', pymongo.ASCENDING), ('semester', pymongo.ASCENDING),
+                               ('sectionYear', pymongo.ASCENDING)],
+                              unique=True,
+                              name='departmentAbbreviation_courseNumber_studentID_semester_sectionYears')
 
 
 # schema 
