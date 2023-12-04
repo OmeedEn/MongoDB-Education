@@ -41,6 +41,7 @@ sections_index = sections.index_information()
                                ('sectionYear', pymongo.ASCENDING)],
                               unique=True,
                               name='departmentAbbreviation_courseNumber_studentID_semester_sectionYears')
+    pprint(sections.index_information())
 
 
 # schema 
