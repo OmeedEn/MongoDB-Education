@@ -22,6 +22,7 @@ courses_index = courses.index_information()
         courses.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseNumber', pymongo.ASCENDING)],
                              unique=True,
                              name='departmentAbbreviation_and_courseNumbers')
+    pprint(courses.index_information())
 
 
 # schema 
