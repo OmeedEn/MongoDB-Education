@@ -1,16 +1,11 @@
-import pymongo
-from orm_base import Base
-from sqlalchemy import Table
-from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
-from sqlalchemy import String, Integer, Identity
-from sqlalchemy.types import Time
-from sqlalchemy import UniqueConstraint, ForeignKeyConstraint, CheckConstraint
-from IntrospectionFactory import IntrospectionFactory
-from Enrollment import Enrollment
-from Course import Course
-from typing import List
-from datetime import time
-class Section(db):
+# creating collection
+
+
+# unique indexes 
+
+
+
+# schema 
 
     section_validator = {
         'validator': {
@@ -97,44 +92,3 @@ class Section(db):
             }
         }
     }
-
-
-
-    def __init__(self, course: Course, sectionNumber: int,
-                 semester: str, sectionYear: int, building: str, room: int, schedule: str,
-                 startTime: Time, instructor: str):
-        self.set_course(course)
-        self.sectionNumber = sectionNumber
-        self.semester = semester
-        self.sectionYear = sectionYear
-        self.building = building
-        self.room = room
-        self.schedule = schedule
-        self.startTime = startTime
-        self.instructor = instructor
-
-    # initialize migrated values from course into section
-    def set_course(self, course: Course):
-        self.course = course
-        self.departmentAbbreviation = course.departmentAbbreviation
-        self.courseNumber = course.courseNumber
-
-    # basing off add_major/add_student from student.py
-    def add_student(self, student):
-        for next_student in self.students:
-            if next_student.student == student:
-                return
-        enrollment = Enrollment(student, self)
-
-
-    def remove_enrollment(self, student):
-        for next_student in self.students:
-            if next_student.student == student:
-                self.students.remove(next_student)
-                return
-
-    def __str__(self):
-        return f"Department Abbreviation: {self.departmentAbbreviation}\nCourse Number: {self.courseNumber}\n" \
-               f"Section Number: {self.sectionNumber}\nSemester: {self.semester}\nSection Year: {self.sectionYear}\n" \
-               f"Building: {self.building}\nRoom: {self.room}\nSchedule: {self.schedule}\nStart Time: {self.startTime}\n" \
-               f"Instructor: {self.instructor}"
