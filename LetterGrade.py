@@ -1,6 +1,7 @@
 import pymongo
 import pprint
 
+#not sure if we need a primary key 
 letter_grade_validator = {
     'validator': {
         '$jsonSchema': {
