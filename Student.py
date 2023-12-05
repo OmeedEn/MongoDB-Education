@@ -33,7 +33,7 @@ students_indexes = students.index_information()
                 'required': ['student_id', 'lastname', 'firstname', 'email'],
                 'additionalProperties': False,
                 'properties': {
-                    '_id': {},
+                    '_id': {'student_id'},
                     'student_id': {
                         'bsonType': 'integer',
                         'description': 'Student identification number'
