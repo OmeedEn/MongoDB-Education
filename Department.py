@@ -48,7 +48,7 @@ departments_indexes = departments.index_information()
                 'required': ['abbreviation', 'name', 'chair_name', 'building', 'office', 'description'],
                 'additionalProperties': False,
                 'properties': {
-                    '_id': {},
+                    '_id': {'abbreviation'}, # primary key
                     'abbreviation': {
                         'bsonType': 'string',
                         'minLength': 1,
