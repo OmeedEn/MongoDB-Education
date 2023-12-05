@@ -30,15 +30,18 @@ students_indexes = students.index_information()
             '$jsonSchema': {
                 'bsonType': 'object',
                 'description': 'A student in a university.',
-                'required': ['student_id', 'lastname', 'firstname', 'email'],
+                'required': ['_id', 'lastname', 'firstname', 'email'],
                 'additionalProperties': False,
                 'properties': {
-                    '_id': {'student_id'},
-                    'student_id': {
+                    '_id': {
                         'bsonType': 'integer',
                         'description': 'Student identification number'
-                        #add the primary key relation
                     },
+                    # 'studentId': {
+                    #     'bsonType': 'integer',
+                    #     'description': 'Student identification number'
+                    #     #add the primary key relation
+                    # },
                     'lastname': {
                         'bsonType': 'string',
                         'minLength': 1,
