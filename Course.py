@@ -31,16 +31,22 @@ course_validator = {
         '$jsonSchema': {
             'bsonType': 'object',
             'description': 'A course in a department.',
-            'required': ['courseNumber', 'courseName','description', 'units'],
+            'required': ['_id', 'courseName','description', 'units'],
             'additionalProperties': False,
             'properties': {
-                '_id': {'courseNumber'}, #primary key
-                'courseNumber': {
+                '_id': {
                     'bsonType': 'number',
                     'minLength': 1,
                     'maxLength': 6,
                     'description': 'The course ID that is unique to that course.'
-                },
+
+                }, #primary key
+                # 'courseNumber': {
+                #     'bsonType': 'integer',
+                #     'minLength': 1,
+                #     'maxLength': 6,
+                #     'description': 'The course ID that is unique to that course.'
+                # },
                 'courseName': {
                     'bsonType': 'string',
                     'minLength': 1,
