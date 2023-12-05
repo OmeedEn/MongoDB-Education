@@ -224,6 +224,166 @@ def delete_department(db):
     print(f"We just deleted: {deleted.deleted_count} departments.")
 
 #add add, delete, select, and list for course, section, major...
+
+def select_department(db):
+    collection = db["department"]
+    found: bool = False
+    name: str = ''
+    while not found:
+        name = input("Department's name--> ")
+        name_count: int = collection.count_documents({"name": name})
+        found = name_count == 1
+        if not found:
+            print("No department found by that name. Try again.")
+    found_department = collection.find_one({"name": name})
+    return found_department
+
+def add_department(db):
+    # collection pointer to department collections in db
+    collection = db["department"]
+    unique_name: bool = False
+    unique_abbreviation: bool = False
+    unique_chair_name: bool = False
+    unique_building_and_office: bool = False
+    unique_description: bool = False
+    name: str = ''
+    abbreviation: str = ''
+    chair_name: str = ''
+    building: str = ''
+    office: int = 0
+    description: str = ''
+    while not unique_abbreviation or not unique_name or not unique_chair_name or not unique_building_and_office or not unique_description:
+        name = input("Department full name--> ")
+        abbreviation = input("Department abbreviation--> ")
+        chair_name = input("Department chair name--> ")
+        building = input("Department building--> ")
+        office = int(input("Department office--> "))
+        description = input("Department description--> ")
+        name_count: int = collection.count_documents({"name": name})
+        unique_name = name_count == 0
+        if not unique_name:
+            print("There is already a department with that name. Try again")
+        if unique_name:
+            abbreviation_count = collection.count_documents({"abbreviation": abbreviation})
+            unique_abbreviation = abbreviation_count == 0
+        if not unique_abbreviation:
+            print("We already have a department with that abbreviation. Try again.")
+        if unique_abbreviation:
+            chair_count = collection.count_documents({"chair_name": chair_name})
+            unique_chair_name = chair_count == 0
+            if not unique_chair_name:
+                print("We already have a department with that chair name. Try again.")
+                if unique_chair_name:
+                    build_office_count = collection.count_documents({"building": building, "office": office})
+                    unique_building_and_office = build_office_count == 0
+                    if not unique_building_and_office:
+                        print("We already have a department with that building and office. Try again.")
+                        if unique_building_and_office:
+                            description_count = collection.count_documents({"description": description})
+                            unique_description = description_count == 0
+                            if not unique_description:
+                                print("We already have a department with that description. Try again.")
+
+    department = {
+    "name": name,
+    "abbreviation": abbreviation,
+    "chair_name": chair_name,
+    "building": building,
+    "office": office,
+    "description": description
+    }
+
+    collection.insert_one(department)
+
+def list_department(db):
+    departments = db["department"].find({}).sort([("name", pymongo.ASCENDING)])
+    # pretty print is good enough for this work. It doesn't have to win a beauty contest.
+    for department in departments:
+        pprint(department)
+
+def delete_department(db):
+    department = select_department(db)
+    # Create a "pointer" to the students collection within the db database.
+    departments = db["department"]
+    # student["_id"] returns the _id value from the selected student document.
+    deleted = departments.delete_one({"_id": department["_id"]})
+    # The deleted variable is a document that tells us, among other things, how
+    # many documents we deleted.
+    print(f"We just deleted: {deleted.deleted_count} departments.")
+
+#add add, delete, and list for course, section, major...
+
+def add_course(db):
+    """
+    Prompt the user for the information for a new course and validate
+    the input to make sure that we do not create any duplicates.
+    :param db: The database connection.
+    :return:    None
+    """
+    print("Which department offers this course?")
+    department = select_department(db)  # This function should be implemented to select a department.
+    unique_number = False
+    unique_name = False
+    number = -1
+    name = ''
+
+    while not unique_number or not unique_name:
+        name = input("Course full name--> ")
+        number = int(input("Course number--> "))
+
+        name_count = db.courses.count_documents({'department': department, 'name': name})
+        unique_name = name_count == 0
+
+        if not unique_name:
+            print("We already have a course by that name in that department. Try again.")
+
+        if unique_name:
+            number_count = db.courses.count_documents({'department': department, 'number': number})
+            unique_number = number_count == 0
+
+            if not unique_number:
+                print("We already have a course in this department with that number. Try again.")
+
+    description = input('Please enter the course description-->')
+    units = int(input('How many units for this course-->'))
+
+    course = {
+        'department': department,
+        'number': number,
+        'name': name,
+        'description': description,
+        'units': units
+    }
+
+    db.courses.insert_one(course)
+
+def select_course(db):
+    collection = db["course"]
+    found: bool = False
+    department_abbreviation = ''
+    course_number = -1
+
+    while not found:
+        department_abbreviation = input("Department abbreviation--> ")
+        course_number = int(input("Course Number--> "))
+
+        found = course_number == 1
+        if not found:
+            print("No course by that number in that department. Try again.")
+
+    course = collection.find_one(
+        {'departmentAbbreviation': department_abbreviation, 'courseNumber': course_number})
+
+    return course
+
+def list_course(db):
+    courses = db["courses"].find({}).sort([("", pymongo.ASCENDING),
+                                           ("", pymongo.ASCENDING)])
+    for course in courses:
+        pprint(course)
+
+
+
 if __name__ == '__main__':
     cluster = ""
     client = MongoClient(cluster)
