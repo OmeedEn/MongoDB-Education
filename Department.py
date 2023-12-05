@@ -43,18 +43,23 @@ departments_indexes = departments.index_information()
     department_validator = {
         'validator': {
             '$jsonSchema': {
-                'bsonType': 'object',
+                'bsonType': 'object', #not too sure if this needs to be an array yet
                 'description': 'A department in a university.',
-                'required': ['abbreviation', 'name', 'chair_name', 'building', 'office', 'description'],
+                'required': ['_id', 'name', 'chair_name', 'building', 'office', 'description'],
                 'additionalProperties': False,
                 'properties': {
-                    '_id': {'abbreviation'}, # primary key
-                    'abbreviation': {
+                    '_id': {
                         'bsonType': 'string',
                         'minLength': 1,
                         'maxLength': 6,
                         'description': 'Short phrase that describes a department name.'
-                    },
+                    }, # primary key
+                    # 'abbreviation': {
+                    #     'bsonType': 'string',
+                    #     'minLength': 1,
+                    #     'maxLength': 6,
+                    #     'description': 'Short phrase that describes a department name.'
+                    # },
                     'name': {
                         'bsonType': 'string',
                         'minLength': 10,
