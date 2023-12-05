@@ -55,7 +55,7 @@ sections_index = sections.index_information()
                              'sectionYear', 'schedule', 'room', 'building', 'startTime', 'instructor'],
                 'additionalProperties': False,
                 'properties': {
-                    '_id': {},
+                    '_id': {'sectionId', 'departmentAbbreviation', 'sectionNnumber'}, #three primary keys?
                     'departmentAbbreviation': {
                         'bsonType': 'string',
                         'minLength': 1,
