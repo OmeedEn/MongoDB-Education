@@ -382,6 +382,44 @@ def list_course(db):
     for course in courses:
         pprint(course)
 
+def add_major(db):
+    collection = db["majors"]
+    print("Which department offers this major?")
+    department = select_department(db)  # Assuming select_department is adapted for MongoDB
+    unique_name = False
+    name = ''
+
+    while not unique_name:
+        name = input("Major name--> ")
+        name_count = db.majors.count_documents({'name': name, 'departmentAbbreviation': department['abbreviation']})
+        unique_name = name_count == 0
+        if not unique_name:
+            print("We already have a major by that name in that department. Try again.")
+
+    description = input('Please give this major a description -->')
+    major = {
+        'name': name,
+        'description': description
+    }
+    collection.insert_one(major)
+
+def select_major(db):
+
+    collection = db["major"]
+    found: bool = False
+    name = ''
+
+    while not found:
+        name = input("Major's name--> ")
+        major = collection.find_one({'name': name})
+        found = major is not None
+        if not found:
+            print("No major found by that name. Try again.")
+
+    major = collection.find_one(
+        {'name': name})
+
+    return major
 
 
 if __name__ == '__main__':
