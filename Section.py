@@ -1,16 +1,49 @@
-import pymongo
-from orm_base import Base
-from sqlalchemy import Table
-from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
-from sqlalchemy import String, Integer, Identity
-from sqlalchemy.types import Time
-from sqlalchemy import UniqueConstraint, ForeignKeyConstraint, CheckConstraint
-from IntrospectionFactory import IntrospectionFactory
-from Enrollment import Enrollment
-from Course import Course
-from typing import List
-from datetime import time
-class Section(db):
+# collections
+sections = db['sections']
+    section_count = sections.count_documents({})
+    print(f'Sections in collection so far: {section_count}')
+
+
+# unique index 
+sections_index = sections.index_information()
+    if 'course_sectionNumber_semester_sectionYear' in sections_index.keys():
+        print('course, section year, section number, and semester index present')
+    else:
+        # create a single UNIQUE index on course, section year, section number, and semester
+        sections.create_index([('course', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
+                               ('sectionNumber', pymongo.ASCENDING), ('semester', pymongo.ASCENDING)],
+                              unique=True,
+                              name='course_sectionNumber_semester_sectionYears')
+    if 'semester_sectionYear_building_room_schedule_startTime' in sections_index.keys():
+        print('semester, section year, building, room, schedule, and start time index present')
+    else:
+        # create a UNIQUE index on semester, section year, building, room, schedule, start time
+        sections.create_index([('semester', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
+                               ('building', pymongo.ASCENDING), ('room', pymongo.ASCENDING),
+                               ('schedule', pymongo.ASCENDING), ('startTime', pymongo.ASCENDING)],
+                              unique=True,
+                              name='semester_sectionYear_building_room_schedule_startTimes')
+    if 'semester_sectionYear_schedule_startTime_instructor' in sections_index.keys():
+        print('semester, section year, schedule, start time, instructor index present')
+    else:
+        # create a UNQIUE index on semester, section year, schedule, start time, instructor
+        sections.create_index([('semester', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
+                               ('schedule', pymongo.ASCENDING), ('startTime', pymongo.ASCENDING),
+                               ('instructor', pymongo.ASCENDING)],
+                              unique=True,
+                              name='semester_sectionYear_schedule_startTime_instructors')
+    if 'departmentAbbreviation_courseNumber_studentID_semester_sectionYear' in sections_index.keys():
+        print('department abbreviation, course number, student ID, semester, section year index present')
+    else:
+        # create a UNQIUE index on department abbreviation, course number, student ID, semester, section year
+        sections.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseNumber', pymongo.ASCENDING),
+                               ('studentID', pymongo.ASCENDING), ('semester', pymongo.ASCENDING),
+                               ('sectionYear', pymongo.ASCENDING)],
+                              unique=True,
+                              name='departmentAbbreviation_courseNumber_studentID_semester_sectionYears')
+
+
+# schema
 
     section_validator = {
         'validator': {
@@ -104,43 +137,3 @@ class Section(db):
         }
     }
 
-
-
-    # def __init__(self, course: Course, sectionNumber: int,
-    #              semester: str, sectionYear: int, building: str, room: int, schedule: str,
-    #              startTime: Time, instructor: str):
-    #     self.set_course(course)
-    #     self.sectionNumber = sectionNumber
-    #     self.semester = semester
-    #     self.sectionYear = sectionYear
-    #     self.building = building
-    #     self.room = room
-    #     self.schedule = schedule
-    #     self.startTime = startTime
-    #     self.instructor = instructor
-    #
-    # # initialize migrated values from course into section
-    # def set_course(self, course: Course):
-    #     self.course = course
-    #     self.departmentAbbreviation = course.departmentAbbreviation
-    #     self.courseNumber = course.courseNumber
-    #
-    # # basing off add_major/add_student from student.py
-    # def add_student(self, student):
-    #     for next_student in self.students:
-    #         if next_student.student == student:
-    #             return
-    #     enrollment = Enrollment(student, self)
-    #
-    #
-    # def remove_enrollment(self, student):
-    #     for next_student in self.students:
-    #         if next_student.student == student:
-    #             self.students.remove(next_student)
-    #             return
-    #
-    # def __str__(self):
-    #     return f"Department Abbreviation: {self.departmentAbbreviation}\nCourse Number: {self.courseNumber}\n" \
-    #            f"Section Number: {self.sectionNumber}\nSemester: {self.semester}\nSection Year: {self.sectionYear}\n" \
-    #            f"Building: {self.building}\nRoom: {self.room}\nSchedule: {self.schedule}\nStart Time: {self.startTime}\n" \
-    #            f"Instructor: {self.instructor}"
