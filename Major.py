@@ -26,7 +26,7 @@ major_validator = {
             'required': ['name', 'description'],
             'additionalProperties': False,
             'properties': {
-                '_id': {}, #change to relationship
+                '_id': {'name'}, #change to relationship
                 'name': {
                     'bsonType': 'string',
                     'minLength': 1,
