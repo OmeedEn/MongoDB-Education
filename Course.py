@@ -34,7 +34,7 @@ course_validator = {
             'required': ['courseNumber', 'courseName','description', 'units'],
             'additionalProperties': False,
             'properties': {
-                '_id': {},
+                '_id': {'courseNumber'}, #primary key
                 'courseNumber': {
                     'bsonType': 'number',
                     'minLength': 1,
