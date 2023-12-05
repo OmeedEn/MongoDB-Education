@@ -1,4 +1,6 @@
-# collection 
+import pymongo
+import pprint
+# collection
 majors = db['majors']
     major_count = majors.count_documents({})
     print(f'Majors in collection so far: {major_count}')
@@ -23,16 +25,21 @@ major_validator = {
         '$jsonSchema': {
             'bsonType': 'object',
             'description': 'A major in a department.',
-            'required': ['name', 'description'],
+            'required': ['_id', 'description'], #i dont think we need the name attribute in here anymore
             'additionalProperties': False,
             'properties': {
-                '_id': {'name'}, #change to relationship
-                'name': {
+                '_id': {
                     'bsonType': 'string',
                     'minLength': 1,
                     'maxLength': 50,
                     'description': 'A word that refers to a major.'
-                },
+                }, #change to relationship
+                # 'name': {
+                #     'bsonType': 'string',
+                #     'minLength': 1,
+                #     'maxLength': 50,
+                #     'description': 'A word that refers to a major.'
+                # },
                 'description': {
                     'bsonType': 'string',
                     'minLength': 10,
