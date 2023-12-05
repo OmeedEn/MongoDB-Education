@@ -420,7 +420,56 @@ def select_major(db):
         {'name': name})
 
     return major
+    
+def add_student_major(db):
 
+    collection = db["student_major"]
+    student = select_student(db)  # Assuming select_student is adapted for MongoDB
+    major = select_major(db)  # Assuming select_major is adapted for MongoDB
+
+    # Check if the student already has this major
+    student_major_count = db.student_majors.count_documents({
+        'studentId': student['_id'],  # Assuming student ID is stored in '_id'
+        'majorName': major['name']  # Assuming major name is stored in 'name'
+    })
+
+    unique_student_major = student_major_count == 0
+
+    while not unique_student_major:
+        print("That student already has that major. Try again.")
+        student = select_student(db)
+        major = select_major(db)
+        student_major_count = db.students.count_documents({
+            '_id': student['_id'],
+            'majors': major['name']
+        })
+        unique_student_major = student_major_count == 0
+
+    collection.add(student, major)
+
+def delete_student_major(db):
+    collection = db["student_major"]
+    print("Prompting you for the student and the major that they no longer have.")
+    student = select_student(db)  # Assuming select_student is adapted for MongoDB
+    major = select_major(db)  # Assuming select_major is adapted for MongoDB
+
+    collection.delete_one({"_id": student["_id"]})
+    collection.delete_one({"_id": major["_id"]})
+    print("We just deleted the student_major. ")
+
+def list_student_major(db):
+    student = select_student(db)  # Assuming select_student is adapted for MongoDB
+    # Assuming each student document has a 'majors' field that is a list of major names
+    student_data = db.students.find_one({'_id': student['_id']}, {'majors': 1, 'lastName': 1, 'firstName': 1})
+
+    if student_data and 'majors' in student_data:
+        for major_name in student_data['majors']:
+            major_data = db.majors.find_one({'name': major_name}, {'description': 1})
+            if major_data:
+                print(
+                    f"Student name: {student_data['lastName']}, {student_data['firstName']}, Major: {major_name}, Description: {major_data.get('description', 'No description')}")
+    else:
+        print("No majors found for this student.")
 
 if __name__ == '__main__':
     cluster = ""
