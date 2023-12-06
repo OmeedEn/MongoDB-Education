@@ -1,7 +1,6 @@
 import pymongo
 import pprint
 
-#not sure if we need a primary key 
 letter_grade_validator = {
     'validator': {
         '$jsonSchema': {
@@ -13,6 +12,7 @@ letter_grade_validator = {
                 '_id': {},
                 'minSatisfactory': {
                     'bsonType': 'string',
+                    'enum': ['A', 'B', 'C'],
                     'description': 'the minimum grade that would be satisfactory'
                 }
             }
