@@ -561,12 +561,13 @@ def add_student_pass_fail(db):
     print("Student added to section as pass/fail.")
 
 if __name__ == '__main__':
-    cluster = ""
+    cluster = "mongodb+srv://AngelaAndJustin:SpkZVc@cecs323.mxqdekf.mongodb.net/?retryWrites=true&w=majority"
+    print('Cluster: mongodb+srv://AngelaAndJustin:****@cecs323.mxqdekf.mongodb.net/?retryWrites=true&w=majority')
     client = MongoClient(cluster)
     # As a test that the connection worked, print out the database names.
     print(client.list_database_names())
     # db will be the way that we refer to the database from here on out.
-    db = client["Demonstration"]
+    db = client["CECS323MongoDB"]
     # Print off the collections that we have available to us, again more of a test than anything.
     print(db.list_collection_names())
 
