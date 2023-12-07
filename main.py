@@ -456,6 +456,15 @@ def select_major(db):
         {'name': name})
 
     return major
+
+def list_majors(db):
+
+    majors = db["majors"].find({}).sort([("", pymongo.ASCENDING),
+                                        ("", pymongo.ASCENDING)])
+
+    for major in majors:
+        pprint(major)
+
 def add_student_major(db):
 
     collection = db["student_major"]
