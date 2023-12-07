@@ -133,8 +133,7 @@ def list_student(db):
     # no criteria. Essentially this is analogous to a SQL find * from students.
     # Each tuple in the sort specification has the name of the field, followed
     # by the specification of ascending versus descending.
-    students = db["students"].find({}).sort([("last_name", pymongo.ASCENDING),
-    ("first_name", pymongo.ASCENDING)])
+    students = db["students"].find({}).sort([("last_name", pymongo.ASCENDING), ("first_name", pymongo.ASCENDING)])
     # pretty print is good enough for this work. It doesn't have to win a beauty contest.
     for student in students:
         pprint(student)
@@ -186,14 +185,14 @@ def add_department(db):
                                 print("We already have a department with that description. Try again.")
 
     department = {
-    "name": name,
-    "abbreviation": abbreviation,
-    "chair_name": chair_name,
-    "building": building,
-    "office": office,
-    "description": description
+        "name": name,
+        "abbreviation": abbreviation,
+        "chair_name": chair_name,
+        "building": building,
+        "office": office,
+        "description": description
     }
-    result = collection.insert_one(department)
+    collection.insert_one(department)
 
 def list_department(db):
     departments = db["department"].find({}).sort([("name", pymongo.ASCENDING)])
@@ -227,12 +226,8 @@ def select_department(db):
     return found_department
 
 def add_course(db):
-    """
-    Prompt the user for the information for a new course and validate
-    the input to make sure that we do not create any duplicates.
-    :param db: The database connection.
-    :return:    None
-    """
+    collection = db["courses"]
+
     print("Which department offers this course?")
     department = select_department(db)  # This function should be implemented to select a department.
     unique_number = False
@@ -244,14 +239,14 @@ def add_course(db):
         name = input("Course full name--> ")
         number = int(input("Course number--> "))
 
-        name_count = db.courses.count_documents({'department': department, 'name': name})
+        name_count = collection.count_documents({'department': department, 'name': name})
         unique_name = name_count == 0
 
         if not unique_name:
             print("We already have a course by that name in that department. Try again.")
 
         if unique_name:
-            number_count = db.courses.count_documents({'department': department, 'number': number})
+            number_count = collection.count_documents({'department': department, 'number': number})
             unique_number = number_count == 0
 
             if not unique_number:
@@ -268,7 +263,7 @@ def add_course(db):
         'units': units
     }
 
-    db.courses.insert_one(course)
+    collection.insert_one(course)
 
 def select_course(db):
     collection = db["course"]
@@ -289,6 +284,81 @@ def select_course(db):
 
     return course
 
+def add_section(db):
+    collection = db["sections"]
+    # Assuming you have a function to select a course
+    course = select_course(db)
+
+    unique_section_number = False
+    unique_room = False
+    unique_instructor = False
+
+    while not (unique_section_number and unique_room and unique_instructor):
+        section_number = int(input("Section number--> "))
+        section_year = int(input("Section Year--> "))
+        semester = input("Section semester--> ")
+        schedule = input("Schedule--> ")
+        start_time_hour = int(input("Section start time hour--> "))
+        start_time_minute = int(input("Section start time minute--> "))
+        building = input("Section building--> ")
+        room = int(input("Section room--> "))
+        instructor = input("Section instructor--> ")
+
+        # Validate semester, schedule, building, etc. as needed
+
+        # Construct startTime as a string or a datetime object
+        start_time = datetime(section_year, 1, 1, start_time_hour, start_time_minute)
+
+        # Check for unique section number
+        section_count = collection.count_documents({
+            "course_id": course["_id"],
+            "section_number": section_number,
+            "semester": semester,
+            "section_year": section_year
+        })
+        unique_section_number = section_count == 0
+
+        # Check for unique room set
+        room_set_count = collection.count_documents({
+            "section_year": section_year,
+            "semester": semester,
+            "schedule": schedule,
+            "start_time": start_time,
+            "building": building,
+            "room": room
+        })
+        unique_room_set = room_set_count == 0
+
+        # Check for unique instructor set
+        instructor_set_count = collection.count_documents({
+            "section_year": section_year,
+            "semester": semester,
+            "schedule": schedule,
+            "start_time": start_time,
+            "instructor": instructor
+        })
+        unique_instructor_set = instructor_set_count == 0
+
+        if not unique_section_number:
+            print("Section number already exists for this course. Try again.")
+        elif not unique_room_set:
+            print("Room is already booked for this time. Try again.")
+        elif not unique_instructor_set:
+            print("Instructor is already teaching at this time. Try again.")
+
+        new_section = {
+            "course_id": course["_id"],
+            "section_number": section_number,
+            "semester": semester,
+            "section_year": section_year,
+            "building": building,
+            "room": room,
+            "schedule": schedule,
+            "start_time": start_time,
+            "instructor": instructor
+        }
+
+        collection.insert_one(new_section)
 def select_section(db):
     collection = db["section"]
     found: bool = False
@@ -317,6 +387,30 @@ def select_section(db):
             return section
         else:
             print("No section with those values for that course. Try again.")
+
+def delete_section(db):
+
+    section_collection = db["sections"]
+    enrollment_collection = db["enrollments"]
+
+    print("Deleting a section")
+
+    # Assuming you have a function to select a section
+    section = select_section(db)
+
+    if section is None:
+        print("No section selected or section not found.")
+        return
+
+    # Assuming 'sectionID' in the 'enrollments' collection references 'sectionID' in the 'sections' collection
+    n_enrollments = enrollment_collection.count_documents({"sectionID": section["_id"]})
+
+    if n_enrollments > 0:
+        print(f"Sorry, there are {n_enrollments} enrollments in that section. Delete them first, "
+              f"then come back here to delete the section.")
+    else:
+        section_collection.delete_one({"_id": section["_id"]})
+        print("Section deleted successfully.")
 
 def list_course(db):
     courses = db["courses"].find({}).sort([("", pymongo.ASCENDING),
@@ -369,7 +463,7 @@ def add_student_major(db):
     major = select_major(db)  # Assuming select_major is adapted for MongoDB
 
     # Check if the student already has this major
-    student_major_count = db.student_majors.count_documents({
+    student_major_count = collection.count_documents({
         'studentId': student['_id'],  # Assuming student ID is stored in '_id'
         'majorName': major['name']  # Assuming major name is stored in 'name'
     })
@@ -387,7 +481,6 @@ def add_student_major(db):
         unique_student_major = student_major_count == 0
 
     collection.add(student, major)
-
 def delete_student_major(db):
     collection = db["student_major"]
     print("Prompting you for the student and the major that they no longer have.")
@@ -397,7 +490,6 @@ def delete_student_major(db):
     collection.delete_one({"_id": student["_id"]})
     collection.delete_one({"_id": major["_id"]})
     print("We just deleted the student_major. ")
-
 def list_student_major(db):
     student = select_student(db)  # Assuming select_student is adapted for MongoDB
     # Assuming each student document has a 'majors' field that is a list of major names
@@ -411,7 +503,6 @@ def list_student_major(db):
                     f"Student name: {student_data['lastName']}, {student_data['firstName']}, Major: {major_name}, Description: {major_data.get('description', 'No description')}")
     else:
         print("No majors found for this student.")
-
 def add_letter_grade(db):
     collection = db["enrollments"]
 
