@@ -1,28 +1,31 @@
+import pymongo
+from pymongo import MongoClient
+from pprint import pprint
+
 # collections
 courses = db['courses']
-    course_count = courses.count_documents({})
-    print(f'Courses in the collection so far: {course_count}')
-
+course_count = courses.count_documents({})
+print(f'Courses in the collection so far: {course_count}')
 
 # unique index 
 courses_index = courses.index_information()
 
-    if 'departmentAbbreviation_and_courseName' in courses_index.keys():
-        print('department abbreviation and course name index present')
-    else:
-        # create a single UNIQUE index on departmentAbbreviation and courseName
-        courses.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseName', pymongo.ASCENDING)],
-                             unique=True,
-                             name='departmentAbbreviation_and_courseNames')
-        
-    if 'departmentAbbreviation_and_courseNumber' in courses_index.keys():
-        print('department abbreviation and course number index present')
-    else:
-        # create a single UNIQUE index on departmentAbbreviation and courseNumber
-        courses.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseNumber', pymongo.ASCENDING)],
-                             unique=True,
-                             name='departmentAbbreviation_and_courseNumbers')
-    pprint(courses.index_information())
+if 'departmentAbbreviation_and_courseName' in courses_index.keys():
+    print('department abbreviation and course name index present')
+else:
+    # create a single UNIQUE index on departmentAbbreviation and courseName
+    courses.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseName', pymongo.ASCENDING)],
+                         unique=True,
+                         name='departmentAbbreviation_and_courseNames')
+
+if 'departmentAbbreviation_and_courseNumber' in courses_index.keys():
+    print('department abbreviation and course number index present')
+else:
+    # create a single UNIQUE index on departmentAbbreviation and courseNumber
+    courses.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseNumber', pymongo.ASCENDING)],
+                         unique=True,
+                         name='departmentAbbreviation_and_courseNumbers')
+pprint(courses.index_information())
 
 
 # schema 
@@ -31,22 +34,23 @@ course_validator = {
         '$jsonSchema': {
             'bsonType': 'object',
             'description': 'A course in a department.',
-            'required': ['_id', 'courseName','description', 'units'],
+            'required': ['courseNumber', 'courseName','description', 'units'],
             'additionalProperties': False,
             'properties': {
                 '_id': {
-                    'bsonType': 'number',
+                    'bsonType': 'integer',
                     'minLength': 1,
                     'maxLength': 6,
                     'description': 'The course ID that is unique to that course.'
-
                 }, #primary key
-                # 'courseNumber': {
-                #     'bsonType': 'integer',
-                #     'minLength': 1,
-                #     'maxLength': 6,
-                #     'description': 'The course ID that is unique to that course.'
-                # },
+                'courseNumber': {
+                    'bsonType': 'number',
+                    'minLength': 1,
+                    'maxLength': 6,
+                    'minimum': 100,
+                    'maximum': 699,
+                    'description': 'The course ID that is unique to that course.'
+                },
                 'courseName': {
                     'bsonType': 'string',
                     'minLength': 1,
@@ -61,6 +65,8 @@ course_validator = {
                 },
                 'units': {
                     'bsonType': 'number',
+                    'minimum': 1,
+                    'maximum': 5,
                     'description': 'Amount of units a specific course has.'
                 },
             }
