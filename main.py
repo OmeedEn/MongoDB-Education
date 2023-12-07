@@ -1,6 +1,7 @@
 import pymongo
 from pymongo import MongoClient
 from pprint import pprint
+from datetime import datetime
 from menu_definitions import menu_main
 from menu_definitions import add_menu
 from menu_definitions import delete_menu
@@ -73,9 +74,10 @@ def add_student(db):
                 print("We already have a student with that e-mail address. Try again.")
     # Build a new students document preparatory to storing it
     student = {
-    "last_name": lastName,
-    "first_name": firstName,
-    "e_mail": email
+        # "_id": student.studentID # not sure if we need this
+        "last_name": lastName,
+        "first_name": firstName,
+        "e_mail": email
     }
     results = collection.insert_one(student)
 def select_student(db):
@@ -136,20 +138,6 @@ def list_student(db):
     # pretty print is good enough for this work. It doesn't have to win a beauty contest.
     for student in students:
         pprint(student)
-
-
-def select_department(db):
-    collection = db["department"]
-    found: bool = False
-    name: str = ''
-    while not found:
-        name = input("Department's name--> ")
-        name_count: int = collection.count_documents({"name": name})
-        found = name_count == 1
-        if not found:
-            print("No department found by that name. Try again.")
-    found_department = collection.find_one({"name": name})
-    return found_department
 
 def add_department(db):
     # collection pointer to department collections in db
@@ -238,81 +226,6 @@ def select_department(db):
     found_department = collection.find_one({"name": name})
     return found_department
 
-def add_department(db):
-    # collection pointer to department collections in db
-    collection = db["department"]
-    unique_name: bool = False
-    unique_abbreviation: bool = False
-    unique_chair_name: bool = False
-    unique_building_and_office: bool = False
-    unique_description: bool = False
-    name: str = ''
-    abbreviation: str = ''
-    chair_name: str = ''
-    building: str = ''
-    office: int = 0
-    description: str = ''
-    while not unique_abbreviation or not unique_name or not unique_chair_name or not unique_building_and_office or not unique_description:
-        name = input("Department full name--> ")
-        abbreviation = input("Department abbreviation--> ")
-        chair_name = input("Department chair name--> ")
-        building = input("Department building--> ")
-        office = int(input("Department office--> "))
-        description = input("Department description--> ")
-        name_count: int = collection.count_documents({"name": name})
-        unique_name = name_count == 0
-        if not unique_name:
-            print("There is already a department with that name. Try again")
-        if unique_name:
-            abbreviation_count = collection.count_documents({"abbreviation": abbreviation})
-            unique_abbreviation = abbreviation_count == 0
-        if not unique_abbreviation:
-            print("We already have a department with that abbreviation. Try again.")
-        if unique_abbreviation:
-            chair_count = collection.count_documents({"chair_name": chair_name})
-            unique_chair_name = chair_count == 0
-            if not unique_chair_name:
-                print("We already have a department with that chair name. Try again.")
-                if unique_chair_name:
-                    build_office_count = collection.count_documents({"building": building, "office": office})
-                    unique_building_and_office = build_office_count == 0
-                    if not unique_building_and_office:
-                        print("We already have a department with that building and office. Try again.")
-                        if unique_building_and_office:
-                            description_count = collection.count_documents({"description": description})
-                            unique_description = description_count == 0
-                            if not unique_description:
-                                print("We already have a department with that description. Try again.")
-
-    department = {
-    "name": name,
-    "abbreviation": abbreviation,
-    "chair_name": chair_name,
-    "building": building,
-    "office": office,
-    "description": description
-    }
-
-    collection.insert_one(department)
-
-def list_department(db):
-    departments = db["department"].find({}).sort([("name", pymongo.ASCENDING)])
-    # pretty print is good enough for this work. It doesn't have to win a beauty contest.
-    for department in departments:
-        pprint(department)
-
-def delete_department(db):
-    department = select_department(db)
-    # Create a "pointer" to the students collection within the db database.
-    departments = db["department"]
-    # student["_id"] returns the _id value from the selected student document.
-    deleted = departments.delete_one({"_id": department["_id"]})
-    # The deleted variable is a document that tells us, among other things, how
-    # many documents we deleted.
-    print(f"We just deleted: {deleted.deleted_count} departments.")
-
-#add add, delete, and list for course, section, major...
-
 def add_course(db):
     """
     Prompt the user for the information for a new course and validate
@@ -376,6 +289,35 @@ def select_course(db):
 
     return course
 
+def select_section(db):
+    collection = db["section"]
+    found: bool = False
+    section_year: int
+    semester: str
+    schedule: str
+    instructor: str
+
+    while not found:
+        section_year = int(input("Enter section year: "))
+        semester = input("Enter semester: ")
+        schedule = input("Enter schedule: ")
+        instructor = input("Enter instructor: ")
+
+        section_s = {
+            "sectionYear": section_year,
+            "semester": semester,
+            "schedule": schedule,
+            "instructor": instructor
+        }
+
+        section = collection.find_one(section_s)
+
+        if section:
+            print("Selected section:\n", section)
+            return section
+        else:
+            print("No section with those values for that course. Try again.")
+
 def list_course(db):
     courses = db["courses"].find({}).sort([("", pymongo.ASCENDING),
                                            ("", pymongo.ASCENDING)])
@@ -420,7 +362,6 @@ def select_major(db):
         {'name': name})
 
     return major
-    
 def add_student_major(db):
 
     collection = db["student_major"]
@@ -470,6 +411,63 @@ def list_student_major(db):
                     f"Student name: {student_data['lastName']}, {student_data['firstName']}, Major: {major_name}, Description: {major_data.get('description', 'No description')}")
     else:
         print("No majors found for this student.")
+
+def add_letter_grade(db):
+    collection = db["enrollments"]
+
+    unique_student_section = False
+    while not unique_student_section:
+        grade = input("What is the Satisfactory grade?---> ")
+
+        # Assuming select_student and select_section return the ObjectId of the selected document
+        student_id = select_student(db)  # Modify this function as needed
+        section_id = select_section(db)  # Modify this function as needed
+
+        # Check if the student is already enrolled in the section
+        enrollment = collection.find_one({"studentId": student_id, "sectionId": section_id})
+
+        if not enrollment:
+            print("No enrollment record found for that student and section. Try again.")
+        else:
+            # Update the enrollment record with the letter grade
+            letter_grade = {
+                "minSatisfactory": grade  # Assuming you want to record the date of grade assignment
+            }
+
+            collection.update_one(
+                {"_id": enrollment["_id"]},
+                {"$set": {"letterGrade": letter_grade}}
+            )
+            print("Letter grade added to the student's enrollment.")
+            unique_student_section = True
+def add_student_pass_fail(db):
+
+    collection = db["enrollments"]
+
+    student_id = select_student(db)
+    section_id = select_section(db)
+    # Check if the student is already enrolled in the section
+    if collection.find_one({'studentId': student_id, 'sectionId': section_id}):
+        print("That section already has that student enrolled in it. Try again.")
+        return
+
+    # Create a pass/fail record as a subschema
+    pass_fail = {
+        'applicationDate': datetime.now(),
+        # Add other passFail fields here if necessary
+    }
+
+    # Create the enrollment record with the passFail subschema
+    enrollment = {
+        'studentId': student_id,
+        'sectionId': section_id,
+        'passFail': pass_fail,
+        # Include other fields or subschemas (like letterGrade) if necessary
+    }
+
+    # Add the enrollment record to the enrollments collection
+    collection.insert_one(enrollment)
+    print("Student added to section as pass/fail.")
 
 if __name__ == '__main__':
     cluster = ""
