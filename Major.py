@@ -47,4 +47,4 @@ major_validator = {
         }
     }
 }
-db.command('collMod', 'majors', **department_validator)
+db.command('collMod', 'majors', **major_validator)
