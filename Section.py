@@ -125,11 +125,10 @@ section_validator = {
                 'startTime': {
                     'bsonType': 'string',
                     'description': 'the time the class starts at',
-                    'format': 'time-am-pm',
-                    'minLength': 8,
-                    'max_length': 8,
-                    'minimum': '08:00 AM',
-                    'maximum': '07:30 PM'
+                        'pattern': '^((0[8-9]|1[0-2]):[0-5][0-9]|1[2-8]:[0-5][0-9]|19:[0-2][0-9]|19:30)$',
+                        # this is saying from ((8-9 OR 10-12) : 00-59) OR (12-18 : 00-59) OR (19: 00-29) OR (19:30)
+                        'minLength': 5,
+                        'maxLength': 5
                 },
                 'instructor': {
                     'bsonType': 'string',
