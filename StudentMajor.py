@@ -38,3 +38,4 @@ student_major_validator = {
         }
     }
 }
+db.command('collMod', 'students', **student_major_validator)
