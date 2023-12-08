@@ -37,12 +37,7 @@ course_validator = {
             'required': ['courseNumber', 'courseName','description', 'units'],
             'additionalProperties': False,
             'properties': {
-                '_id': {
-                    'bsonType': 'integer',
-                    'minLength': 1,
-                    'maxLength': 6,
-                    'description': 'The course ID that is unique to that course.'
-                }, #primary key
+                '_id': {}, #primary key
                 'courseNumber': {
                     'bsonType': 'number',
                     'minLength': 1,
@@ -74,5 +69,4 @@ course_validator = {
         }
     }
 }
-
-
+db.command('collMod', 'courses', **department_validator)
