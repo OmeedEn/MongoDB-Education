@@ -52,12 +52,7 @@ department_validator = {
             'required': ['abbreviation', 'name', 'chair_name', 'building', 'office', 'description'],
             'additionalProperties': False,
             'properties': {
-                '_id': {
-                    'bsonType': 'string',
-                    'minLength': 1,
-                    'maxLength': 6,
-                    'description': 'Short phrase that describes a department name.'
-                }, # primary key
+                '_id': {}, # primary key
                 'abbreviation': {
                     'bsonType': 'string',
                     'minLength': 1,
