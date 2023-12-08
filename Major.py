@@ -30,12 +30,7 @@ major_validator = {
             'required': ['name', 'description'],
             'additionalProperties': False,
             'properties': {
-                '_id': {
-                    'bsonType': 'string',
-                    'minLength': 1,
-                    'maxLength': 50,
-                    'description': 'A word that refers to a major.'
-                }, #change to relationship
+                '_id': {}, #change to relationship
                 'name': {
                     'bsonType': 'string',
                     'minLength': 1,
@@ -52,5 +47,4 @@ major_validator = {
         }
     }
 }
-
-
+db.command('collMod', 'majors', **department_validator)
