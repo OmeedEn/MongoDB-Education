@@ -64,4 +64,4 @@ student_validator = {
     }
 }
 }
-db.command('collMod', 'students', **department_validator)
+db.command('collMod', 'students', **student_validator)
