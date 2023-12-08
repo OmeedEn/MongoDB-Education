@@ -24,7 +24,14 @@ else:
     # Create a UNIQUE index on just the e-mail address
     students.create_index([('e_mail', pymongo.ASCENDING)],
                           unique=True,
-                          name='students_e_mail')
+                          name='students_e_mails')
+if '_id' in students_indexes.keys():
+        print('id index present.')
+else:
+    # create a UNIQUE index on the _id
+    students.create_index(['_id', pymongo.ASCENDING],
+                          unique=True,
+                          name='_ids')
 pprint(students.index_information())
 
 
