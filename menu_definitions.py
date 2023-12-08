@@ -19,30 +19,30 @@ menu_main = Menu('main', 'Please select one of the following options:', [
     Option("Exit this application", "pass")
 ])
 add_menu = Menu('add', 'Please indicate what you want to add:', [
-    Option("Department", "add_department(db)"),
-    Option("Course", "add_course(db)"),
-    Option("Major", "add_major(db)"),
-    Option("Student", "add_student(db)"),
-    Option("Section", "add_section(db)"),
+    Option("Department", "dep_add(db)"),
+    Option("Course", "cour_add(db)"),
+    Option("Major", "maj_add(db)"),
+    Option("Student", "stud_add(db)"),
+    Option("Section", "sec_add(db)"),
     # Option("Student to Major", "add_student_major(db)"),
     # Option("Major to Student", "add_major_student(db)"),
     Option("Exit", "pass")
 ])
 delete_menu = Menu('delete', 'Please indicate what you want to delete from:', [
-    Option("Department", "delete_department(db)"),
-    Option("Course", "delete_course(db)"),
-    Option("Major", "delete_major(db)"),
-    Option("Student", "delete_student(db)"),
-    Option("Section", "delete_section(db)"),
+    Option("Department", "dep_del(db)"),
+    Option("Course", "cour_del(db)"),
+    Option("Major", "maj_del(db)"),
+    Option("Student", "stud_del(db)"),
+    Option("Section", "sec_del(db)"),
     # Option("Student to Major", "delete_student_major(db)"),
     # Option("Major to Student", "delete_major_student(db)"),
     Option("Exit", "pass")
 ])
 list_menu = Menu('list', 'Please indicate what you want to list:', [
-    Option("Department", "list_department(db)"),
-    Option("Course", "list_course(db)"),
-    Option("Major", "list_major(db)"),
-    Option("Student", "list_student(db)"),
+    Option("Department", "dep_lis(db)"),
+    Option("Course", "cour_lis(db)"),
+    Option("Major", "maj_lis(db)"),
+    Option("Student", "stud_lis(db)"),
     # Option("Student to Major", "list_student_major(db)"),
     # Option("Major to Student", "list_major_student(db)"),
     Option("Exit", "pass")
