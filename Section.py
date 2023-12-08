@@ -137,3 +137,4 @@ section_validator = {
         }
     }
 }
+db.command('collMod', 'sections', **department_validator)
