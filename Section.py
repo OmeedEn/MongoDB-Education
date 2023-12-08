@@ -123,8 +123,13 @@ section_validator = {
                     'description': 'the building that the section is being taught in'
                 },
                 'startTime': {
-                    'bsonType': 'time',
-                    'description': 'the time the class starts at'
+                    'bsonType': 'string',
+                    'description': 'the time the class starts at',
+                    'format': 'time-am-pm',
+                    'minLength': 8,
+                    'max_length': 8,
+                    'minimum': '08:00 AM',
+                    'maximum': '07:30 PM'
                 },
                 'instructor': {
                     'bsonType': 'string',
