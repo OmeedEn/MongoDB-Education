@@ -37,10 +37,7 @@ student_validator = {
             'required': ['studentId', 'lastname', 'firstname', 'email'],
             'additionalProperties': False,
             'properties': {
-                '_id': {
-                    'bsonType': 'integer',
-                    'description': 'Student identification number'
-                },
+                '_id': {},
                 'studentId': {
                     'bsonType': 'integer',
                     'description': 'Student identification number'
@@ -67,5 +64,4 @@ student_validator = {
     }
 }
 }
-
-
+db.command('collMod', 'students', **department_validator)
