@@ -194,6 +194,65 @@ def add_department(db):
     }
     collection.insert_one(department)
 
+    # add_department()
+    collection = db['departments']
+    unique_name: bool = False
+    unique_abbreviation: bool = False
+    unique_chair_name: bool = False
+    unique_room: bool = False
+    unique_description: bool = False
+
+    name: str = ''
+    abbreviation: str = ''
+    chair_name: str = ''
+    building: str = ''
+    office: int = 0
+    description: str = ''
+
+    while not unique_abbreviation and not unique_name and not unique_chair_name and not unique_room \
+            and not unique_description:
+        name = input("Department full name--> ")
+        abbreviation = input("Department abbreviation--> ")
+        chair_name = input('Chair name --> ')
+        building = input('Building name --> ')
+        office = int(input('Office number --> '))
+        description = input('Description --> ')
+        name_count: int = collection.count_documents({'name': name})
+        unique_name = name_count == 0
+        if not unique_name:
+            print("We already have a department by that name.  Try again.")
+        if unique_name:
+            abbreviation_count: int = collection.count_documents({'abbreviation': abbreviation})
+            unique_abbreviation = abbreviation_count == 0
+            if not unique_abbreviation:
+                print("We already have a department with that abbreviation.  Try again.")
+                if unique_abbreviation:
+                    chair_count: int = collection.count_documents({'chair_name': chair_name})
+                    unique_chair_name = chair_count == 0
+                    if not unique_chair_name:
+                        print('We already have that chair in another department. Try again.')
+                    if unique_chair_name:
+                        room_count: int = collection.count_documents({'building': building, 'office': office})
+                        unique_room = room_count == 0
+                        if not unique_room:
+                            print('We already have a department that occupies that room')
+                        if unique_room:
+                            desc_count: int = collection.count_documents({'description': description})
+                            unique_description = desc_count == 0
+                            if not unique_description:
+                                print('We already have a department with that description.')
+    # Build a new department document preparatory to storing it
+    department = {
+        'abbreviation': abbreviation,
+        'name': name,
+        'chair_name': chair_name,
+        'building': building,
+        'office':office,
+        'description': description
+    }
+    results = collection.insert_one(department)
+
+
 def list_department(db):
     departments = db["department"].find({}).sort([("name", pymongo.ASCENDING)])
     # pretty print is good enough for this work. It doesn't have to win a beauty contest.
