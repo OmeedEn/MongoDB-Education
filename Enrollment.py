@@ -10,43 +10,37 @@ import Section
 #import function
 def add_letter_grade(db):
     collection = db["enrollments"]
-
-    unique_student_section = False
-    while not unique_student_section:
+    unique_enrollment = False
+    student = Student.select_student(db)
+    section = Section.select_section(db)
+    grade: str = ''
+    while not unique_enrollment:
         grade = input("What is the Satisfactory grade?---> ")
 
-        # Assuming select_student and select_section return the ObjectId of the selected document
-        student_id = Student.select_student(db)  # Modify this function as needed
-        section_id = Section.select_section(db)  # Modify this function as needed
-
         # Check if the student is already enrolled in the section
-        enrollment = collection.find_one({"studentId": student_id, "sectionId": section_id})
-
-        if not enrollment:
+        enrollment_count = collection.count_documents({"studentId": student['_id'], "sectionId": section['_id']})
+        unique_enrollment = enrollment_count == 0
+        if not unique_enrollment:
             print("No enrollment record found for that student and section. Try again.")
-        else:
+        if unique_enrollment:
             # Update the enrollment record with the letter grade
             letter_grade = {
-                "minSatisfactory": grade  # Assuming you want to record the date of grade assignment
-            }
-
+                "minSatisfactory": grade}
             enrollment = {
-                'studentId': student_id,
-                'sectionId': section_id,
-                'letterGrade': letter_grade,
-                # Include other fields or subschemas (like letterGrade) if necessary
+                'studentId': student['_id'],
+                'sectionId': section['_id'],
+                'letterGrade': letter_grade
             }
             collection.insert_one(enrollment)
             print("Letter grade added to the student's enrollment.")
-            unique_student_section = True
 def add_student_pass_fail(db):
-
     collection = db["enrollments"]
-
-    student_id = Student.select_student(db)
-    section_id = Section.select_section(db)
-    # Check if the student is already enrolled in the section
-    if collection.find_one({'studentId': student_id, 'sectionId': section_id}):
+    student = Student.select_student(db)
+    section = Section.select_section(db)
+    unique_enrollment = False
+    while not unique_enrollment:
+        enrollment_count = collection.count_documents({"studentId": student['_id'], "sectionId": section['_id']})
+    if collection.find_one({'studentId': student['_id'], 'sectionId': section['_id']}):
         print("That section already has that student enrolled in it. Try again.")
         return
 
