@@ -24,6 +24,7 @@ add_menu = Menu('add', 'Please indicate what you want to add:', [
     Option("Major", "maj_add(db)"),
     Option("Student", "stud_add(db)"),
     Option("Section", "sec_add(db)"),
+    Option("Student Major", "studmaj_add(db)"),
     # Option("Student to Major", "add_student_major(db)"),
     # Option("Major to Student", "add_major_student(db)"),
     Option("Exit", "pass")
@@ -34,6 +35,7 @@ delete_menu = Menu('delete', 'Please indicate what you want to delete from:', [
     Option("Major", "maj_del(db)"),
     Option("Student", "stud_del(db)"),
     Option("Section", "sec_del(db)"),
+    Option("Student Major", "studmaj_del(db)"),
     # Option("Student to Major", "delete_student_major(db)"),
     # Option("Major to Student", "delete_major_student(db)"),
     Option("Exit", "pass")
@@ -43,6 +45,7 @@ list_menu = Menu('list', 'Please indicate what you want to list:', [
     Option("Course", "cour_lis(db)"),
     Option("Major", "maj_lis(db)"),
     Option("Student", "stud_lis(db)"),
+    Option("Student Major", "studmaj_lis(db)"),
     # Option("Student to Major", "list_student_major(db)"),
     # Option("Major to Student", "list_major_student(db)"),
     Option("Exit", "pass")
