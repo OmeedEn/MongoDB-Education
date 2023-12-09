@@ -14,12 +14,6 @@ def add_department(db):
     unique_chair_name: bool = False
     unique_building_and_office: bool = False
     unique_description: bool = False
-    name: str = ''
-    abbreviation: str = ''
-    chair_name: str = ''
-    building: str = ''
-    office: int = 0
-    description: str = ''
     while not unique_abbreviation or not unique_name or not unique_chair_name or not unique_building_and_office or not unique_description:
         name = input("Department full name--> ")
         abbreviation = input("Department abbreviation--> ")
@@ -32,7 +26,6 @@ def add_department(db):
         unique_name = name_count == 0
         if not unique_name:
             print("There is already a department with that name. Try again")
-
         if unique_name:
             abbreviation_count = collection.count_documents({"abbreviation": abbreviation})
             unique_abbreviation = abbreviation_count == 0
@@ -53,17 +46,15 @@ def add_department(db):
                         unique_description = description_count == 0
                         if not unique_description:
                             print("We already have a department with that description. Try again.")
-
-    department = {
-        "name": name,
-        "abbreviation": abbreviation,
-        "chair_name": chair_name,
-        "building": building,
-        "office": office,
-        "description": description
-    }
-    collection.insert_one(department)
-    # result = collection.insert_one(department)
+        department = {
+            "name": name,
+            "abbreviation": abbreviation,
+            "chair_name": chair_name,
+            "building": building,
+            "office": office,
+            "description": description
+        }
+        collection.insert_one(department)
 
 def list_department(db):
     departments = db["departments"].find({}).sort([("name", pymongo.ASCENDING)])
@@ -96,12 +87,10 @@ def select_department(db):
 
 # schema function
 def create_department(db):
-
     # collections
     departments = db['departments']
     department_count = departments.count_documents({})
     print(f'Departments in the collection so far: {department_count}')
-
 
     # unique indexes
     departments_indexes = departments.index_information()
@@ -139,10 +128,11 @@ def create_department(db):
                                  name='names')
     pprint(departments.index_information())
 
+    # schema
     department_validator = {
         'validator': {
             '$jsonSchema': {
-                'bsonType': 'object',  # not too sure if this needs to be an array yet
+                'bsonType': 'object',
                 'description': 'A department in a university.',
                 'required': ['abbreviation', 'name', 'chair_name', 'building', 'office', 'description'],
                 'additionalProperties': False,
