@@ -8,9 +8,7 @@ import Course
 #imported functions
 def add_section(db):
     collection = db["sections"]
-    # Assuming you have a function to select a course
     course = Course.select_course(db)
-
     unique_section_number = False
     unique_room = False
     unique_instructor = False
@@ -26,48 +24,47 @@ def add_section(db):
         room = int(input("Section room--> "))
         instructor = input("Section instructor--> ")
 
-        # Validate semester, schedule, building, etc. as needed
+        if start_time_hour > 9:
+            hour = f'{start_time_hour}'
+        elif start_time_hour <= 9:
+            hour = f'0{start_time_hour}'
+        if start_time_minute <= 9:
+            minute = f'0{start_time_minute}'
+        elif start_time_minute > 9:
+            minute = f'{start_time_minute}'
 
-        # Construct startTime as a string or a datetime object
-        start_time = datetime(section_year, 1, 1, start_time_hour, start_time_minute)
+        start_time = f'{hour}:{minute}'
 
         # Check for unique section number
         section_count = collection.count_documents({
             "course_id": course["_id"],
             "section_number": section_number,
             "semester": semester,
-            "section_year": section_year
-        })
+            "section_year": section_year})
         unique_section_number = section_count == 0
-
-        # Check for unique room set
-        room_set_count = collection.count_documents({
-            "section_year": section_year,
-            "semester": semester,
-            "schedule": schedule,
-            "start_time": start_time,
-            "building": building,
-            "room": room
-        })
-        unique_room_set = room_set_count == 0
-
-        # Check for unique instructor set
-        instructor_set_count = collection.count_documents({
-            "section_year": section_year,
-            "semester": semester,
-            "schedule": schedule,
-            "start_time": start_time,
-            "instructor": instructor
-        })
-        unique_instructor_set = instructor_set_count == 0
-
         if not unique_section_number:
             print("Section number already exists for this course. Try again.")
-        elif not unique_room_set:
-            print("Room is already booked for this time. Try again.")
-        elif not unique_instructor_set:
-            print("Instructor is already teaching at this time. Try again.")
-
+            if unique_section_number:
+                room_set_count = collection.count_documents({
+                    "section_year": section_year,
+                    "semester": semester,
+                    "schedule": schedule,
+                    "start_time": start_time,
+                    "building": building,
+                    "room": room})
+                unique_room_set = room_set_count == 0
+                if not unique_room_set:
+                    print("Room is already booked for this time. Try again.")
+                    if unique_room_set:
+                        instructor_set_count = collection.count_documents({
+                            "section_year": section_year,
+                            "semester": semester,
+                            "schedule": schedule,
+                            "start_time": start_time,
+                            "instructor": instructor})
+                        unique_instructor_set = instructor_set_count == 0
+                        if not unique_instructor_set:
+                            print("Instructor is already teaching at this time. Try again.")
         new_section = {
             "course_id": course["_id"],
             "section_number": section_number,
@@ -77,61 +74,48 @@ def add_section(db):
             "room": room,
             "schedule": schedule,
             "start_time": start_time,
-            "instructor": instructor
-        }
+            "instructor": instructor}
         collection.insert_one(new_section)
 def select_section(db):
     collection = db["section"]
     found: bool = False
-    section_year: int
-    semester: str
-    schedule: str
-    instructor: str
-
+    section_year: int = -1
+    semester: str = ''
+    schedule: str = ''
+    instructor: str = ''
     while not found:
         section_year = int(input("Enter section year: "))
         semester = input("Enter semester: ")
         schedule = input("Enter schedule: ")
         instructor = input("Enter instructor: ")
-
         section_s = {
             "sectionYear": section_year,
             "semester": semester,
             "schedule": schedule,
-            "instructor": instructor
-        }
-
-        section = collection.find_one(section_s)
-
-        if section:
-            print("Selected section:\n", section)
-            return section
-        else:
-            print("No section with those values for that course. Try again.")
-
+            "instructor": instructor}
+        section_count = collection.find_one(section_s)
+        found = section_count == 1
+        if not found:
+            print('No section found by those attributes. Try again.')
+    found_section = collection.find_one({'semester': semester}, {'sectionYear': section_year},
+                                        {'schedule': schedule}, {'instructor': instructor})
+    return found_section
 def delete_section(db):
-
-    section_collection = db["sections"]
-    enrollment_collection = db["enrollments"]
-
-    print("Deleting a section")
-
-    # Assuming you have a function to select a section
+    sections = db["sections"]
+    enrollments = db["enrollments"]
     section = select_section(db)
-
-    if section is None:
-        print("No section selected or section not found.")
-        return
-
-    # Assuming 'sectionID' in the 'enrollments' collection references 'sectionID' in the 'sections' collection
-    n_enrollments = enrollment_collection.count_documents({"sectionID": section["_id"]})
-
+    n_enrollments = enrollments.count_documents({"sectionID": section["_id"]})
     if n_enrollments > 0:
         print(f"Sorry, there are {n_enrollments} enrollments in that section. Delete them first, "
               f"then come back here to delete the section.")
     else:
-        section_collection.delete_one({"_id": section["_id"]})
-        print("Section deleted successfully.")
+        deleted = sections.delete_one({'_id': section['_id']})
+        print(f'We just deleted: {deleted.deleted_count} departments.')
+
+def list_section(db):
+    sections = db['sections'].find({}).sort([('sectionNumber', pymongo.ASCENDING)])
+    for section in sections:
+        pprint(section)
 
 # schema function
 def create_section(db):
@@ -143,11 +127,11 @@ def create_section(db):
 
     # unique indexes
     sections_index = sections.index_information()
-    if 'course_sectionNumber_semester_sectionYear' in sections_index.keys():
-        print('course, section year, section number, and semester index present')
+    if 'courseNumber_sectionNumber_semester_sectionYear' in sections_index.keys():
+        print('courseNumber, section year, section number, and semester index present')
     else:
         # create a single UNIQUE index on course, section year, section number, and semester
-        sections.create_index([('course', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
+        sections.create_index([('courseNumber', pymongo.ASCENDING), ('sectionYear', pymongo.ASCENDING),
                                ('sectionNumber', pymongo.ASCENDING), ('semester', pymongo.ASCENDING)],
                               unique=True,
                               name='course_sectionNumber_semester_sectionYears')
@@ -185,30 +169,16 @@ def create_section(db):
             '$jsonSchema': {
                 'bsonType': 'object',
                 'description': 'A Section in a Course.',
-                'required': ['departmentAbbreviation', 'sectionId', 'name', 'courseNumber', 'sectionNumber', 'semester',
+                'required': ['departmentAbbreviation', 'courseNumber', 'sectionNumber', 'name', 'semester',
                              'sectionYear', 'schedule', 'room', 'building', 'startTime', 'instructor'],
                 'additionalProperties': True,
                 'properties': {
-                    '_id': {},  # three primary keys?
+                    '_id': {},
                     'departmentAbbreviation': {
                         'bsonType': 'string',
                         'minLength': 1,
                         'maxLength': 6,
                         'description': 'Short phrase that describes a department name.'
-                        # add foreign key
-                    },
-                    'sectionId': {
-                        'bsonType': 'number',
-                        'minLength': 1,
-                        'maxLength': 50,
-                        'description': 'The Id that is given to a Section of a Course'
-                        # add primary key
-                    },
-                    'name': {
-                        'bsonType': 'string',
-                        'minLength': 1,
-                        'maxLength': 50,
-                        'description': 'A word that refers to a course.'
                     },
                     'courseNumber': {
                         'bsonType': 'string',
@@ -219,6 +189,12 @@ def create_section(db):
                     'sectionNumber': {
                         'bsonType': 'number',
                         'description': 'The number of the section.'
+                    },
+                    'name': {
+                        'bsonType': 'string',
+                        'minLength': 1,
+                        'maxLength': 50,
+                        'description': 'A word that refers to a course.'
                     },
                     'semester': {
                         'bsonType': 'string',
@@ -272,4 +248,3 @@ def create_section(db):
         }
     }
     db.command('collMod', 'sections', **section_validator)
-
