@@ -13,37 +13,29 @@ def add_course(db):
     department = Department.select_department(db)  # This function should be implemented to select a department.
     unique_number = False
     unique_name = False
-    number = -1
-    name = ''
 
     while not unique_number or not unique_name:
         name = input("Course full name--> ")
         number = int(input("Course number--> "))
-
         name_count = collection.count_documents({'departmentAbbreviation': department['abbreviation'], 'name': name})
         unique_name = name_count == 0
-
         if not unique_name:
             print("We already have a course by that name in that department. Try again.")
-
         if unique_name:
             number_count = collection.count_documents({'departmentAbbreviation': department['abbreviation'], 'number': number})
             unique_number = number_count == 0
-
             if not unique_number:
                 print("We already have a course in this department with that number. Try again.")
-
-    description = input('Please enter the course description-->')
-    units = int(input('How many units for this course-->'))
-
-    course = {
-        'departmentAbbreviation': department['abbreviation'],
-        'courseNumber': number,
-        'courseName': name,
-        'description': description,
-        'units': units
-    }
-    collection.insert_one(course)
+        description = input('Please enter the course description-->')
+        units = int(input('How many units for this course-->'))
+        course = {
+            'departmentAbbreviation': department['abbreviation'],
+            'courseNumber': number,
+            'courseName': name,
+            'description': description,
+            'units': units
+        }
+        collection.insert_one(course)
 
 def select_course(db):
     collection = db["courses"]
@@ -66,7 +58,6 @@ def select_course(db):
 
     return course
 def list_course(db):
-
     courses = db["courses"].find({}).sort([("", pymongo.ASCENDING),
                                            ("", pymongo.ASCENDING)])
     for course in courses:
