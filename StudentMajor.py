@@ -124,3 +124,46 @@ def create_student_major(db):
         }
     }
     db.command('collMod', 'studentMajors', **student_major_validator)
+
+
+
+
+# idk if this runs properly but i think this is what i did for error trapping for the add student major ... his error trapping sample file looks so complicated 
+
+def add_student_major(db):
+    for i in range(2):
+        collection = db["studentMajors"]
+        student = Student.select_student(db)
+        major = Major.select_major(db)
+
+        # Check if the student already has this major
+        student_major_count = collection.count_documents({
+            'studentId': student['_id'],
+            'majorName': major['name']
+        })
+        unique_student_major = student_major_count == 0
+
+        while not unique_student_major:
+            print("That student already has that major. Try again.")
+            student = Student.select_student(db)
+            major = Major.select_major(db)
+            student_major_count = db.students.count_documents({
+                '_id': student['_id'],
+                'majorName': major['name']
+            })
+            unique_student_major = student_major_count == 0
+
+        name = f'{student['first_name']} {student['last_name']}'
+        student_major = {
+                'studentId': student['_id'],
+                'studentName': name,
+                'majorId': major['_id'],
+                'majorName': major['name'],
+                'declarationDate': datetime.datetime.now()
+            }
+        try:
+            collection.insert_one(student_major)
+        except Exception as exception:
+            print(f'You\'ve got an error: {exception}')
+        else:
+            break
