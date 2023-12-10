@@ -63,13 +63,20 @@ def list_department(db):
 
 def delete_department(db):
     department = select_department(db)
-    # Create a "pointer" to the students collection within the db database.
     departments = db["departments"]
-    # student["_id"] returns the _id value from the selected student document.
-    deleted = departments.delete_one({"_id": department["_id"]})
-    # The deleted variable is a document that tells us, among other things, how
-    # many documents we deleted.
-    print(f"We just deleted: {deleted.deleted_count} departments.")
+    courses = db['courses']
+    majors = db['majors']
+    n_courses = courses.count_documents({'departmentAbbreviation': department['departmentAbbreviation']})
+    n_majors = majors.count_documents({'departmentAbbreviation': department['departmentAbbreviation']})
+    if n_courses > 0:
+        print(f'Sorry, there are {n_courses} courses in that department. Delete them first, then come back here to '
+              f'delete the department.')
+    elif n_majors > 0:
+        print(f'Sorry, there are {n_majors} majors in that department. Delete them first, then come back here to '
+              f'delete the department.')
+    else:
+        deleted = departments.delete_one({"_id": department["_id"]})
+        print(f"We just deleted: {deleted.deleted_count} departments.")
 
 def select_department(db):
     collection = db["departments"]
