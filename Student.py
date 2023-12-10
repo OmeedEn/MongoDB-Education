@@ -57,22 +57,21 @@ def select_student(db):
     return found_student
 
 def delete_student(db):
-    """
-    Delete a student from the database.
-    :param db: The current database connection.
-    :return: None
-    """
-    # student isn't a Student object (we have no such thing in this application)
-    # rather it's a dict with all the content of the selected student, including
-    # the MongoDB-supplied _id column which is a built-in surrogate.
     student = select_student(db)
-    # Create a "pointer" to the students collection within the db database.
     students = db["students"]
-    # student["_id"] returns the _id value from the selected student document.
-    deleted = students.delete_one({"_id": student["_id"]})
-    # The deleted variable is a document that tells us, among other things, how
-    # many documents we deleted.
-    print(f"We just deleted: {deleted.deleted_count} students.")
+    student_majors = db['studentMajors']
+    enrollments = db['enrollments']
+    n_stuMaj = student_majors.count_documents({'studentId': student['_id']})
+    n_enrollments = enrollments.count_documents({'studentId': student['_id']})
+    if n_stuMaj > 0:
+        print(f'Sorry, there are {n_stuMaj} majors for that student. Delete them first, then come back here to '
+              f'delete the student.')
+    elif n_enrollments > 0:
+        print(f'Sorry, there are {n_enrollments} enrollments for that student. Delete them first, then come back here '
+              f'to delete the student.')
+    else:
+        deleted = students.delete_one({"_id": student["_id"]})
+        print(f"We just deleted: {deleted.deleted_count} students.")
 
 def list_student(db):
     """
