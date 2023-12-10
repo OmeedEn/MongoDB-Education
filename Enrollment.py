@@ -10,37 +10,43 @@ import Section
 #import function
 def add_letter_grade(db):
     collection = db["enrollments"]
-    unique_enrollment = False
-    student = Student.select_student(db)
-    section = Section.select_section(db)
-    grade: str = ''
-    while not unique_enrollment:
+
+    unique_student_section = False
+    while not unique_student_section:
         grade = input("What is the Satisfactory grade?---> ")
 
+        # Assuming select_student and select_section return the ObjectId of the selected document
+        student_id = Student.select_student(db)  # Modify this function as needed
+        section_id = Section.select_section(db)  # Modify this function as needed
+
         # Check if the student is already enrolled in the section
-        enrollment_count = collection.count_documents({"studentId": student['_id'], "sectionId": section['_id']})
-        unique_enrollment = enrollment_count == 0
-        if not unique_enrollment:
+        enrollment = collection.find_one({"studentId": student_id, "sectionId": section_id})
+
+        if not enrollment:
             print("No enrollment record found for that student and section. Try again.")
-        if unique_enrollment:
+        else:
             # Update the enrollment record with the letter grade
             letter_grade = {
-                "minSatisfactory": grade}
+                "minSatisfactory": grade  # Assuming you want to record the date of grade assignment
+            }
+
             enrollment = {
-                'studentId': student['_id'],
-                'sectionId': section['_id'],
-                'letterGrade': letter_grade
+                'studentId': student_id,
+                'sectionId': section_id,
+                'letterGrade': letter_grade,
+                # Include other fields or subschemas (like letterGrade) if necessary
             }
             collection.insert_one(enrollment)
             print("Letter grade added to the student's enrollment.")
+            unique_student_section = True
 def add_student_pass_fail(db):
+
     collection = db["enrollments"]
-    student = Student.select_student(db)
-    section = Section.select_section(db)
-    unique_enrollment = False
-    while not unique_enrollment:
-        enrollment_count = collection.count_documents({"studentId": student['_id'], "sectionId": section['_id']})
-    if collection.find_one({'studentId': student['_id'], 'sectionId': section['_id']}):
+
+    student_id = Student.select_student(db)
+    section_id = Section.select_section(db)
+    # Check if the student is already enrolled in the section
+    if collection.find_one({'studentId': student_id, 'sectionId': section_id}):
         print("That section already has that student enrolled in it. Try again.")
         return
 
@@ -62,6 +68,35 @@ def add_student_pass_fail(db):
     collection.insert_one(enrollment)
     print("Student added to section as pass/fail.")
 
+def select_enrollment(db):
+
+    collection = db["enrollments"]
+    found: bool = False
+    student = Student.select_student(db)
+    section = Section.select_section(db)
+
+    while not found:
+        found_count: int = collection.count_documents({"studentId": student['_id'],
+                                                       "sectionId": section["_id"]})
+        found = found_count == 1
+    if not found:
+        print("No Student found with that section. Try again. ")
+    found_enrollment = collection.find_one({"studentId": student['_id'],
+                                            "sectionId": section["_id"]})
+    return found_enrollment
+def delete_enrollment(db):
+
+    enrollment = select_enrollment(db)
+    enrollments = db["enrollments"]
+
+    deleted = enrollments.delete_one({"_id": enrollment["_id"]})
+
+    print(f"We just deleted: {deleted.deleted_count} enrollments.")
+def list_enrollment(db):
+    enrollments = db["enrollments"].find({}).sort([("_id", pymongo.ASCENDING)])
+
+    for enrollment in enrollments:
+        pprint(enrollment)
 # schema function
 def create_enrollment(db):
 
@@ -95,26 +130,15 @@ def create_enrollment(db):
     enrollment_validator = {
         'bsonType': "object",
         'description': 'the enrollment of the students',
-        'required': ['students', 'enrollment_data'],
-        'additionalProperties': False,
+        'required': ['enrollmentType'],  # Corrected 'enrollment_data' to 'enrollment'
+        'additionalProperties': True,
         'properties': {
-            'students': {
-                'bsonType': 'object',
-                'required': ['student_id'],
-                'additionalProperties': False,
-                'properties': {
-                    'student_id': {
-                        'bsonType': 'objectId',  # not too sure if its different from the object
-                        'description': 'unique identifier of students'
-                    }
-                }
-            },
-            'enrollment': {
+            'enrollmentType': {
                 'oneOf': [
                     {
                         'bsonType': 'object',
                         'required': ['application_date'],
-                        'additionalProperties': False,
+                        'additionalProperties': True,
                         'properties': {
                             'application_date': {
                                 'bsonType': 'date',
@@ -125,7 +149,7 @@ def create_enrollment(db):
                     {
                         'bsonType': 'object',
                         'required': ['min_satisfactory'],
-                        'additionalProperties': False,
+                        'additionalProperties': True,
                         'properties': {
                             'min_satisfactory': {
                                 'bsonType': 'string',
@@ -138,55 +162,4 @@ def create_enrollment(db):
             }
         }
     }
-    db.command('collMod', 'enrollments', **enrollment_validator)
-
-
-# enrollment_validator = {
-#     'validator': {
-#         '$jsonSchema': {
-#             'bsonType': 'object',
-#             'description': 'An enrollment for each student',
-#             'required': ['enrollment'],
-#             'additionalProperties': False,
-#             'properties': {
-#                 '_id': {},
-#                 'enrollment': {
-#                     'bsonType': 'object',
-#                     'description': 'The enrollment for the students',
-#                     'additionalProperties': False,
-#                     'properties': {
-#                         'passFail': {
-#                             'bsonType': 'array',
-#                             'items': {
-#                                 'bsonType': 'object',
-#                                 'description': 'Determines whether a student can pass or fail',
-#                                 'required': ['applicationDate'],  # Add other required fields if any
-#                                 'properties': {
-#                                     'applicationDate': {
-#                                         'bsonType': 'date',
-#                                         'description': 'The date the student filed for pass or fail'
-#                                     },
-#                                 }
-#                             }
-#                         },
-#                         'letterGrade': {
-#                             'bsonType': 'array',
-#                             'items': {
-#                                 'bsonType': 'object',
-#                                 'description': 'The letter grade for each student that is enrolling',
-#                                 'required': ['minSatisfactory'],
-#                                 'properties': {
-#                                     'minSatisfactory': {
-#                                         'bsonType': 'string',
-#                                         'enum': ['A', 'B', 'C'],
-#                                         'description': 'The minimum grade that would be satisfactory'
-#                                     }
-#                                 }
-#                             }
-#                         }
-#                     }
-#                 }
-#             }
-#         }
-#     }
-# }
+    db.command('collMod', 'enrollments', validator=enrollment_validator)
