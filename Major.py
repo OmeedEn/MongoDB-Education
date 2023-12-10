@@ -1,5 +1,4 @@
 import pymongo
-from pymongo import MongoClient
 from pprint import pprint
 from pymongo.errors import CollectionInvalid, OperationFailure
 import Department
@@ -26,20 +25,6 @@ def add_major(db):
         collection.insert_one(major)
 
 def select_major(db):
-    # collection = db["major"]
-    # found: bool = False
-    # name = ''
-    # while not found:
-    #     name = input("Major's name--> ")
-    #     major_count = collection.count_documents({'name': name})
-    #     found = major_count == 1
-    #     if not found:
-    #         print("No major found by that name. Try again.")
-    #
-    # major = collection.find_one(
-    #     {'name': name})
-    # return major
-
     collection = db["majors"]
     found: bool = False
     name = ''
@@ -50,23 +35,17 @@ def select_major(db):
         found = major is not None
         if not found:
             print("No major found by that name. Try again.")
-
     major = collection.find_one(
         {'name': name})
-
     return major
 def list_majors(db):
-
     majors = db["majors"].find({}).sort([("name", pymongo.ASCENDING)])
-
     for major in majors:
         pprint(major)
 def delete_major(db):
-
     major = select_major(db)
     majors = db['majors']
     deleted = majors.delete_one({"_id": major["_id"]})
-
     print(f"We just deleted: {deleted.deleted_count} majors.")
 # schema function
 def create_major(db):
@@ -93,10 +72,14 @@ def create_major(db):
             '$jsonSchema': {
                 'bsonType': 'object',
                 'description': 'A major in a department.',
-                'required': ['name', 'description'],
-                'additionalProperties': True,
+                'required': ['departmentAbbreviation', 'name', 'description'],
+                'additionalProperties': False,
                 'properties': {
                     '_id': {}, #change to relationship
+                    'departmentAbbreviation': {
+                        'bsonType': 'string',
+                        'description': 'A short phrase that describes the department.'
+                    },
                     'name': {
                         'bsonType': 'string',
                         'minLength': 1,
@@ -114,4 +97,3 @@ def create_major(db):
         }
     }
     db.command('collMod', 'majors', **major_validator)
-
