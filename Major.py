@@ -45,8 +45,14 @@ def list_majors(db):
 def delete_major(db):
     major = select_major(db)
     majors = db['majors']
-    deleted = majors.delete_one({"_id": major["_id"]})
-    print(f"We just deleted: {deleted.deleted_count} majors.")
+    student_majors = db['studentMajors']
+    n_stuMaj = student_majors.count_documents({'majorId': major['_id']})
+    if n_stuMaj > 0:
+        print(f"Sorry, there are {n_stuMaj} students in that major. Delete them first, "
+              f"then come back here to delete the major.")
+    else:
+        deleted = majors.delete_one({"_id": major["_id"]})
+        print(f"We just deleted: {deleted.deleted_count} majors.")
 # schema function
 def create_major(db):
     # collection
