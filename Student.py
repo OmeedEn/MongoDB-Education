@@ -1,5 +1,4 @@
 import pymongo
-from pymongo import MongoClient
 from pprint import pprint
 from pymongo.errors import CollectionInvalid, OperationFailure
 
@@ -27,9 +26,7 @@ def add_student(db):
             unique_email = email_count == 0
             if not unique_email:
                 print("We already have a student with that e-mail address. Try again.")
-    # Build a new students document preparatory to storing it
     student = {
-        # "_id": student.studentID # not sure if we need this
         "last_name": lastName,
         "first_name": firstName,
         "e_mail": email
@@ -103,13 +100,6 @@ def create_student(db):
 
     # unique index
     students_indexes = students.index_information()
-    # if '_id' in students_indexes.keys():
-    #     print('id index present.')
-    # else:
-    #     # create a UNIQUE index on the _id
-    #     students.create_index(['_id', pymongo.ASCENDING],
-    #                           unique=True,
-    #                           name='_ids')
     if 'students_last_and_first_names' in students_indexes.keys():
         print("first and last name index present.")
     else:
@@ -158,4 +148,3 @@ def create_student(db):
         }
     }
     db.command('collMod', 'students', **student_validator)
-
