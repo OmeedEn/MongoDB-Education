@@ -22,7 +22,8 @@ def add_course(db):
         if not unique_name:
             print("We already have a course by that name in that department. Try again.")
         if unique_name:
-            number_count = collection.count_documents({'departmentAbbreviation': department['abbreviation'], 'number': number})
+            number_count = collection.count_documents({'departmentAbbreviation': department['abbreviation'],
+                                                       'number': number})
             unique_number = number_count == 0
             if not unique_number:
                 print("We already have a course in this department with that number. Try again.")
@@ -58,8 +59,8 @@ def select_course(db):
 
     return course
 def list_course(db):
-    courses = db["courses"].find({}).sort([("", pymongo.ASCENDING),
-                                           ("", pymongo.ASCENDING)])
+
+    courses = db["courses"].find({}).sort([("courseName", pymongo.ASCENDING)])
     for course in courses:
         pprint(course)
 
