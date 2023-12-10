@@ -68,6 +68,8 @@ def maj_sel(db):
     Major.select_major(db)
 def maj_lis(db):
     Major.list_majors(db)
+def maj_del(db):
+    Major.delete_major(db)
 def cour_add(db):
     Course.add_course(db)
 def cour_sel(db):
