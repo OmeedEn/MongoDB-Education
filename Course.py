@@ -61,9 +61,15 @@ def select_course(db):
 def delete_course(db):
     course = select_course(db)
     courses = db["courses"]
-
-    deleted = courses.delete_one({"_id": course["_id"]})
-    print(f"We just deleted: {deleted.deleted_count} courses.")
+    sections = db['sections']
+    n_sections = sections.count_documents({'courseNumber': course['courseNumber'],
+                                           'departmentAbbreviation': course['departmentAbbreviation']})
+    if n_sections > 0:
+        print(f'Sorry, there are {n_sections} sections in that course. Delete them first, then come back here to '
+              f'delete the course.')
+    else:
+        deleted = courses.delete_one({"_id": course["_id"]})
+        print(f"We just deleted: {deleted.deleted_count} courses.")
 
 def list_course(db):
     courses = db["courses"].find({}).sort([("courseName", pymongo.ASCENDING)])
