@@ -1,7 +1,4 @@
-import pymongo
 from pymongo import MongoClient
-from pprint import pprint
-from datetime import datetime
 from menu_definitions import menu_main
 from menu_definitions import add_menu
 from menu_definitions import delete_menu
@@ -13,6 +10,8 @@ import Section
 import Course
 import StudentMajor
 import Enrollment
+
+
 def add(db):
     """
     Present the add menu and execute the user's selection.
@@ -74,6 +73,8 @@ def cour_add(db):
     Course.add_course(db)
 def cour_sel(db):
     Course.select_course(db)
+def cour_del(db):
+    Course.delete_course(db)
 def cour_lis(db):
     Course.list_course(db)
 def sec_add(db):
@@ -92,6 +93,11 @@ def enroll_add_let(db):
     Enrollment.add_letter_grade(db)
 def enroll_add_pas(db):
     Enrollment.add_student_pass_fail(db)
+def enroll_lis(db):
+    Enrollment.list_enrollment(db)
+def enroll_del(db):
+    Enrollment.delete_enrollment(db)
+
 
 if __name__ == '__main__':
     cluster = 'mongodb+srv://omeedenshaie01:QXK8h6E3JeYWa8mX@cluster0.u4fphnt.mongodb.net/?retryWrites=true&w=majority'
@@ -109,10 +115,9 @@ if __name__ == '__main__':
     Student.create_student(db)
     Major.create_major(db)
     Section.create_section(db)
-    #Enrollment.create_enrollment(db)
+    Enrollment.create_enrollment(db)
     StudentMajor.create_student_major(db)
 
-    # insert our student, department, major, course collections here when ready...
     main_action: str = ''
     while main_action != menu_main.last_action():
         main_action = menu_main.menu_prompt()
