@@ -1,5 +1,4 @@
 import pymongo
-from pymongo import MongoClient
 from pprint import pprint
 from pymongo.errors import CollectionInvalid, OperationFailure
 
@@ -137,7 +136,7 @@ def create_department(db):
                 'required': ['abbreviation', 'name', 'chair_name', 'building', 'office', 'description'],
                 'additionalProperties': False,
                 'properties': {
-                    '_id': {},  # primary key
+                    '_id': {},
                     'abbreviation': {
                         'bsonType': 'string',
                         'minLength': 1,
