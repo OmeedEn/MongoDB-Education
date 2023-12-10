@@ -8,16 +8,18 @@ import Course
 #imported functions
 def add_section(db):
     collection = db["sections"]
+
     course = Course.select_course(db)
     unique_section_number = False
-    unique_room = False
-    unique_instructor = False
+    unique_room_set = False
+    unique_instructor_set = False
 
-    while not (unique_section_number and unique_room and unique_instructor):
+    while not unique_section_number or not unique_room_set or not unique_instructor_set:
         section_number = int(input("Section number--> "))
         section_year = int(input("Section Year--> "))
         semester = input("Section semester--> ")
         schedule = input("Schedule--> ")
+        print("The time is in Military format, 8:00 - 19:30")
         start_time_hour = int(input("Section start time hour--> "))
         start_time_minute = int(input("Section start time minute--> "))
         building = input("Section building--> ")
@@ -37,44 +39,45 @@ def add_section(db):
 
         # Check for unique section number
         section_count = collection.count_documents({
-            "course_id": course["_id"],
-            "section_number": section_number,
+            "courseNumber": course["courseNumber"],
+            "sectionNumber": section_number,
             "semester": semester,
-            "section_year": section_year})
+            "sectionYear": section_year})
         unique_section_number = section_count == 0
         if not unique_section_number:
             print("Section number already exists for this course. Try again.")
-            if unique_section_number:
-                room_set_count = collection.count_documents({
-                    "section_year": section_year,
+        if unique_section_number:
+            room_set_count = collection.count_documents({
+                "sectionYear": section_year,
+                "semester": semester,
+                "schedule": schedule,
+                "startTime": start_time,
+                "building": building,
+                "room": room})
+            unique_room_set = room_set_count == 0
+            if not unique_room_set:
+                print("Room is already booked for this time. Try again.")
+            if unique_room_set:
+                instructor_set_count = collection.count_documents({
+                    "sectionYear": section_year,
                     "semester": semester,
                     "schedule": schedule,
-                    "start_time": start_time,
-                    "building": building,
-                    "room": room})
-                unique_room_set = room_set_count == 0
-                if not unique_room_set:
-                    print("Room is already booked for this time. Try again.")
-                    if unique_room_set:
-                        instructor_set_count = collection.count_documents({
-                            "section_year": section_year,
-                            "semester": semester,
-                            "schedule": schedule,
-                            "start_time": start_time,
-                            "instructor": instructor})
-                        unique_instructor_set = instructor_set_count == 0
-                        if not unique_instructor_set:
-                            print("Instructor is already teaching at this time. Try again.")
+                    "startTime": start_time,
+                    "instructor": instructor})
+                unique_instructor_set = instructor_set_count == 0
+                if not unique_instructor_set:
+                    print("Instructor is already teaching at this time. Try again.")
         new_section = {
-            "course_id": course["_id"],
-            "section_number": section_number,
-            "semester": semester,
-            "section_year": section_year,
-            "building": building,
-            "room": room,
-            "schedule": schedule,
-            "start_time": start_time,
-            "instructor": instructor}
+                    "departmentAbbreviation": course["departmentAbbreviation"],
+                    "courseNumber": course["courseNumber"],
+                    "sectionNumber": section_number,
+                    "semester": semester,
+                    "sectionYear": section_year,
+                    "building": building,
+                    "room": room,
+                    "schedule": schedule,
+                    "startTime": start_time,
+                    "instructor": instructor}
         collection.insert_one(new_section)
 def select_section(db):
     collection = db["section"]
@@ -169,7 +172,7 @@ def create_section(db):
             '$jsonSchema': {
                 'bsonType': 'object',
                 'description': 'A Section in a Course.',
-                'required': ['departmentAbbreviation', 'courseNumber', 'sectionNumber', 'name', 'semester',
+                'required': ['departmentAbbreviation', 'courseNumber', 'sectionNumber', 'semester',
                              'sectionYear', 'schedule', 'room', 'building', 'startTime', 'instructor'],
                 'additionalProperties': True,
                 'properties': {
@@ -181,7 +184,7 @@ def create_section(db):
                         'description': 'Short phrase that describes a department name.'
                     },
                     'courseNumber': {
-                        'bsonType': 'string',
+                        'bsonType': 'number',
                         'minLength': 1,
                         'maxLength': 80,
                         'description': 'The number associated to the course.'
@@ -189,12 +192,6 @@ def create_section(db):
                     'sectionNumber': {
                         'bsonType': 'number',
                         'description': 'The number of the section.'
-                    },
-                    'name': {
-                        'bsonType': 'string',
-                        'minLength': 1,
-                        'maxLength': 50,
-                        'description': 'A word that refers to a course.'
                     },
                     'semester': {
                         'bsonType': 'string',
