@@ -25,8 +25,8 @@ add_menu = Menu('add', 'Please indicate what you want to add:', [
     Option("Student", "stud_add(db)"),
     Option("Section", "sec_add(db)"),
     Option("Student Major", "studmaj_add(db)"),
-    # Option("Student to Major", "add_student_major(db)"),
-    # Option("Major to Student", "add_major_student(db)"),
+    Option("Enrollment - pass/fail", "enroll_add_pas(db)"),
+    Option("Enrollment - letter grade", "enroll_add_let(db)"),
     Option("Exit", "pass")
 ])
 delete_menu = Menu('delete', 'Please indicate what you want to delete from:', [
@@ -36,8 +36,7 @@ delete_menu = Menu('delete', 'Please indicate what you want to delete from:', [
     Option("Student", "stud_del(db)"),
     Option("Section", "sec_del(db)"),
     Option("Student Major", "studmaj_del(db)"),
-    # Option("Student to Major", "delete_student_major(db)"),
-    # Option("Major to Student", "delete_major_student(db)"),
+    Option("Enrollment", "enroll_del(db)"),
     Option("Exit", "pass")
 ])
 list_menu = Menu('list', 'Please indicate what you want to list:', [
@@ -46,7 +45,6 @@ list_menu = Menu('list', 'Please indicate what you want to list:', [
     Option("Major", "maj_lis(db)"),
     Option("Student", "stud_lis(db)"),
     Option("Student Major", "studmaj_lis(db)"),
-    # Option("Student to Major", "list_student_major(db)"),
-    # Option("Major to Student", "list_major_student(db)"),
+    Option("Enrollment", "enroll_lis(db)"),
     Option("Exit", "pass")
 ])
