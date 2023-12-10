@@ -1,7 +1,5 @@
 import pymongo
-from pymongo import MongoClient
 from pprint import pprint
-from datetime import datetime
 from pymongo.errors import CollectionInvalid, OperationFailure
 import Course
 
@@ -80,28 +78,28 @@ def add_section(db):
                     "instructor": instructor}
         collection.insert_one(new_section)
 def select_section(db):
-    collection = db["section"]
+    collection = db["sections"]
     found: bool = False
     section_year: int = -1
     semester: str = ''
     schedule: str = ''
     instructor: str = ''
     while not found:
-        section_year = int(input("Enter section year: "))
-        semester = input("Enter semester: ")
-        schedule = input("Enter schedule: ")
-        instructor = input("Enter instructor: ")
+        section_year = int(input("Enter section year--> "))
+        semester = input("Enter semester--> ")
+        schedule = input("Enter schedule--> ")
+        instructor = input("Enter instructor--> ")
         section_s = {
             "sectionYear": section_year,
             "semester": semester,
             "schedule": schedule,
             "instructor": instructor}
-        section_count = collection.find_one(section_s)
+        section_count = collection.count_documents(section_s)
         found = section_count == 1
         if not found:
             print('No section found by those attributes. Try again.')
-    found_section = collection.find_one({'semester': semester}, {'sectionYear': section_year},
-                                        {'schedule': schedule}, {'instructor': instructor})
+    found_section = collection.find_one({'semester': semester, 'sectionYear': section_year,
+                                        'schedule': schedule, 'instructor': instructor})
     return found_section
 def delete_section(db):
     sections = db["sections"]
@@ -113,7 +111,7 @@ def delete_section(db):
               f"then come back here to delete the section.")
     else:
         deleted = sections.delete_one({'_id': section['_id']})
-        print(f'We just deleted: {deleted.deleted_count} departments.')
+        print(f'We just deleted: {deleted.deleted_count} sections.')
 
 def list_section(db):
     sections = db['sections'].find({}).sort([('sectionNumber', pymongo.ASCENDING)])
@@ -156,15 +154,6 @@ def create_section(db):
                                ('instructor', pymongo.ASCENDING)],
                               unique=True,
                               name='semester_sectionYear_schedule_startTime_instructors')
-    if 'departmentAbbreviation_courseNumber_studentID_semester_sectionYear' in sections_index.keys():
-        print('department abbreviation, course number, student ID, semester, section year index present')
-    else:
-        # create a UNQIUE index on department abbreviation, course number, student ID, semester, section year
-        sections.create_index([('departmentAbbreviation', pymongo.ASCENDING), ('courseNumber', pymongo.ASCENDING),
-                               ('studentID', pymongo.ASCENDING), ('semester', pymongo.ASCENDING),
-                               ('sectionYear', pymongo.ASCENDING)],
-                              unique=True,
-                              name='departmentAbbreviation_courseNumber_studentID_semester_sectionYears')
     pprint(sections.index_information())
 
     section_validator = {
@@ -174,7 +163,7 @@ def create_section(db):
                 'description': 'A Section in a Course.',
                 'required': ['departmentAbbreviation', 'courseNumber', 'sectionNumber', 'semester',
                              'sectionYear', 'schedule', 'room', 'building', 'startTime', 'instructor'],
-                'additionalProperties': True,
+                'additionalProperties': False,
                 'properties': {
                     '_id': {},
                     'departmentAbbreviation': {
