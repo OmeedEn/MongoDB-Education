@@ -1,3 +1,5 @@
+import datetime
+
 import pymongo
 from pymongo import MongoClient
 from pprint import pprint
@@ -31,7 +33,13 @@ def add_student_major(db):
         })
         unique_student_major = student_major_count == 0
 
-    collection.add(student, major)
+    student_major = {
+            'studentId': student['_id'],
+            'major': major['_id'],
+            'declarationDate': datetime.date
+        }
+    collection.insert_one(student_major)
+
 def delete_student_major(db):
     collection = db["studentMajors"]
     print("Prompting you for the student and the major that they no longer have.")
@@ -81,7 +89,7 @@ def create_student_major(db):
                 'bsonType': 'object',
                 'description': 'A major dedicated to a student',
                 'required': ['declarationDate'],
-                'additionalProperties': False,
+                'additionalProperties': True,
                 'properties': {
                     '_id': {},
                     'declarationDate': {
