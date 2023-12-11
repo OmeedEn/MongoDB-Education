@@ -73,6 +73,7 @@ def select_enrollment(db):
     section = Section.select_section(db)
 
     while not found:
+
         found_count: int = collection.count_documents({
             "studentId": student['_id'],
             "sectionId": section["_id"]
@@ -123,7 +124,6 @@ def create_enrollment(db):
                                  name='semester_sectionYear_departmentAbbreviation_courseNumber_studentIDs')
     pprint(enrollments.index_information())
     # schema
-
     enrollment_validator = {
         'validator': {
             '$jsonSchema': {
