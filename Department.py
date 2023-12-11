@@ -1,7 +1,6 @@
 import pymongo
 from pprint import pprint
-from pymongo.errors import CollectionInvalid, OperationFailure
-
+from error_trap import print_exception
 
 # imported add/delete/list
 
@@ -53,7 +52,10 @@ def add_department(db):
             "office": office,
             "description": description
         }
-        collection.insert_one(department)
+        try:
+            collection.insert_one(department)
+        except Exception as e:
+            print(print_exception(e))
 
 def list_department(db):
     departments = db["departments"].find({}).sort([("name", pymongo.ASCENDING)])
@@ -66,8 +68,8 @@ def delete_department(db):
     departments = db["departments"]
     courses = db['courses']
     majors = db['majors']
-    n_courses = courses.count_documents({'departmentAbbreviation': department['departmentAbbreviation']})
-    n_majors = majors.count_documents({'departmentAbbreviation': department['departmentAbbreviation']})
+    n_courses = courses.count_documents({'departmentAbbreviation': department['abbreviation']})
+    n_majors = majors.count_documents({'departmentAbbreviation': department['abbreviation']})
     if n_courses > 0:
         print(f'Sorry, there are {n_courses} courses in that department. Delete them first, then come back here to '
               f'delete the department.')
