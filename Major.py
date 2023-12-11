@@ -1,10 +1,11 @@
 import pymongo
 from pprint import pprint
-from pymongo.errors import CollectionInvalid, OperationFailure
+from error_trap import print_exception
 import Department
 
 #imported functions
 def add_major(db):
+
     collection = db["majors"]
     print("Which department offers this major?")
     department = Department.select_department(db)
@@ -12,17 +13,20 @@ def add_major(db):
 
     while not unique_name:
         name = input("Major name--> ")
+        description = input('Please give this major a description -->')
         name_count = collection.count_documents({'name': name, 'departmentAbbreviation': department['abbreviation']})
         unique_name = name_count == 0
         if not unique_name:
             print("We already have a major by that name in that department. Try again.")
-        description = input('Please give this major a description -->')
         major = {
             'departmentAbbreviation': department['abbreviation'],
             'name': name,
             'description': description
         }
-        collection.insert_one(major)
+        try:
+            collection.insert_one(major)
+        except Exception as e:
+            print(print_exception(e))
 
 def select_major(db):
     collection = db["majors"]
