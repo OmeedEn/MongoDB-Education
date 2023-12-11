@@ -1,7 +1,7 @@
 import pymongo
 from pprint import pprint
 from datetime import datetime
-from pymongo.errors import CollectionInvalid, OperationFailure
+from error_trap import print_exception
 import Student
 import Section
 
@@ -35,7 +35,10 @@ def add_letter_grade(db):
                     'minSatisfactory': grade
                 }
             }
-            collection.insert_one(enrollment)
+            try:
+                collection.insert_one(enrollment)
+            except Exception as e:
+                print(print_exception(e))
 
 def add_student_pass_fail(db):
     collection = db["enrollments"]
@@ -44,6 +47,11 @@ def add_student_pass_fail(db):
     while not unique_enrollment:
         student = Student.select_student(db)
         section = Section.select_section(db)
+        # app_date_year = int(input('Application year--> '))
+        # app_date_month = int(input('Application month--> '))
+        # app_date_day = int(input('Application day--> '))
+        # app_date = datetime(app_date_year, app_date_month, app_date_day, 0, 0)
+
         enrollment_count = collection.count_documents({"studentId": student['_id'], "sectionId": section['_id']})
         unique_enrollment = enrollment_count == 0
         if not unique_enrollment:
@@ -64,7 +72,10 @@ def add_student_pass_fail(db):
                     'applicationDate': datetime.now()
                 }
             }
-            collection.insert_one(enrollment)
+            try:
+                collection.insert_one(enrollment)
+            except Exception as e:
+                print(print_exception(e))
 
 def select_enrollment(db):
     collection = db["enrollments"]
@@ -73,14 +84,15 @@ def select_enrollment(db):
     section = Section.select_section(db)
 
     while not found:
-
         found_count: int = collection.count_documents({
             "studentId": student['_id'],
             "sectionId": section["_id"]
         })
         found = found_count == 1
-    if not found:
-        print("No Student found with that section. Try again. ")
+        if not found:
+            print("No Student found with that section. Try again. ")
+            student = Student.select_student(db)
+            section = Section.select_section(db)
     found_enrollment = collection.find_one({"studentId": student['_id'],
                                             "sectionId": section["_id"]})
     return found_enrollment
