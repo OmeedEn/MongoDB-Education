@@ -1,6 +1,7 @@
 import pymongo
 from pprint import pprint
-from pymongo.errors import CollectionInvalid, OperationFailure
+from error_trap import print_exception
+
 import Course
 
 #imported functions
@@ -76,7 +77,11 @@ def add_section(db):
                     "schedule": schedule,
                     "startTime": start_time,
                     "instructor": instructor}
-        collection.insert_one(new_section)
+        try:
+            collection.insert_one(new_section)
+        except Exception as e:
+            print(print_exception(e))
+
 def select_section(db):
     collection = db["sections"]
     found: bool = False
