@@ -1,6 +1,6 @@
 import pymongo
 from pprint import pprint
-from pymongo.errors import CollectionInvalid, OperationFailure
+from error_trap import print_exception
 
 
 # imported add/delete/list functions
@@ -31,7 +31,10 @@ def add_student(db):
         "first_name": firstName,
         "e_mail": email
     }
-    collection.insert_one(student)
+    try:
+        collection.insert_one(student)
+    except Exception as e:
+        print(print_exception(e))
 def select_student(db):
     """
     Select a student by the combination of the last and first.
@@ -49,10 +52,10 @@ def select_student(db):
         lastName = input("Student's last name--> ")
         firstName = input("Student's first name--> ")
         name_count: int = collection.count_documents({"last_name": lastName,
-        "first_name": firstName})
+                                                      "first_name": firstName})
         found = name_count == 1
-    if not found:
-        print("No student found by that name. Try again.")
+        if not found:
+            print("No student found by that name. Try again.")
     found_student = collection.find_one({"last_name": lastName, "first_name": firstName})
     return found_student
 
