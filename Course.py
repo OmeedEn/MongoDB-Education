@@ -1,6 +1,6 @@
 import pymongo
 from pprint import pprint
-from pymongo.errors import CollectionInvalid, OperationFailure
+from error_trap import print_exception
 import Department
 
 # imported function
@@ -35,7 +35,10 @@ def add_course(db):
             'description': description,
             'units': units
         }
-        collection.insert_one(course)
+        try:
+            collection.insert_one(course)
+        except Exception as e:
+            print(print_exception(e))
 
 def select_course(db):
     collection = db["courses"]
