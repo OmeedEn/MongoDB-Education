@@ -43,6 +43,7 @@ list_menu = Menu('list', 'Please indicate what you want to list:', [
     Option("Course", "cour_lis(db)"),
     Option("Major", "maj_lis(db)"),
     Option("Student", "stud_lis(db)"),
+    Option("Section", "sec_lis(db)"),
     Option("Student Major", "studmaj_lis(db)"),
     Option("Enrollment", "enroll_lis(db)"),
     Option("Exit", "pass")
