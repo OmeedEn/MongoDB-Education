@@ -29,7 +29,7 @@ def add_student_major(db):
         })
         unique_student_major = student_major_count == 0
 
-    name = f'{student['first_name']} {student['last_name']}'
+    name = f"{student['first_name']} {student['last_name']}"
     student_major = {
             'studentId': student['_id'],
             'studentName': name,
