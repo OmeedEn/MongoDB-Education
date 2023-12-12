@@ -94,17 +94,34 @@ def select_section(db):
         semester = input("Enter semester--> ")
         schedule = input("Enter schedule--> ")
         instructor = input("Enter instructor--> ")
+        print("The time is in Military format, 8:00 - 19:30")
+        start_time_hour = int(input("Section start time hour--> "))
+        start_time_minute = int(input("Section start time minute--> "))
+
+        if start_time_hour > 9:
+            hour = f'{start_time_hour}'
+        elif start_time_hour <= 9:
+            hour = f'0{start_time_hour}'
+        if start_time_minute <= 9:
+            minute = f'0{start_time_minute}'
+        elif start_time_minute > 9:
+            minute = f'{start_time_minute}'
+
+        start_time = f'{hour}:{minute}'
+
         section_s = {
             "sectionYear": section_year,
             "semester": semester,
             "schedule": schedule,
-            "instructor": instructor}
+            "instructor": instructor,
+            "startTime": start_time,
+            }
         section_count = collection.count_documents(section_s)
         found = section_count == 1
         if not found:
             print('No section found by those attributes. Try again.')
     found_section = collection.find_one({'semester': semester, 'sectionYear': section_year,
-                                        'schedule': schedule, 'instructor': instructor})
+                                        'schedule': schedule, 'instructor': instructor, 'startTime': start_time})
     return found_section
 def delete_section(db):
     sections = db["sections"]
