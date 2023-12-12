@@ -20,7 +20,7 @@ def add_letter_grade(db):
         if not unique_enrollment:
             print("No enrollment record found for that student and section. Try again.")
         if unique_enrollment:
-            name = f'{student['first_name']} {student['last_name']}'
+            name = f"{student['first_name']} {student['last_name']}"
             enrollment = {
                 'studentId': student['_id'],
                 'studentName': name,
@@ -57,7 +57,7 @@ def add_student_pass_fail(db):
         if not unique_enrollment:
             print('No enrollment record found for that student and section. Try again.')
         if unique_enrollment:
-            name = f'{student['first_name']} {student['last_name']}'
+            name = f"{student['first_name']} {student['last_name']}"
             enrollment = {
                 'studentId': student['_id'],
                 'studentName': name,
