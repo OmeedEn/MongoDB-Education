@@ -83,6 +83,8 @@ def sec_sel(db):
     Section.select_section(db)
 def sec_del(db):
     Section.delete_section(db)
+def sec_lis(db):
+    Section.list_section(db)
 def studmaj_add(db):
     StudentMajor.add_student_major(db)
 def studmaj_lis(db):
